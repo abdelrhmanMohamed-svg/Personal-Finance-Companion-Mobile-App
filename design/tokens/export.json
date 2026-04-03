@@ -1,0 +1,193 @@
+{
+  "version": "1.0.0",
+  "description": "Design token exports for Personal Finance Companion",
+  "lastUpdated": "2026-04-04",
+  "format": "flutter",
+  "tokens": {
+    "colors": {
+      "primary": {
+        "value": "#2E7D32",
+        "description": "Brand green for primary actions"
+      },
+      "primaryHover": {
+        "value": "#1B5E20",
+        "description": "Pressed state"
+      },
+      "primaryLight": {
+        "value": "rgba(46, 125, 50, 0.1)",
+        "description": "Background accent"
+      },
+      "secondary": {
+        "value": "#1565C0",
+        "description": "Secondary actions and links"
+      },
+      "success": {
+        "value": "#43A047",
+        "description": "Positive states, income"
+      },
+      "warning": {
+        "value": "#F9A825",
+        "description": "Warning states"
+      },
+      "error": {
+        "value": "#E53935",
+        "description": "Error states, expenses"
+      },
+      "info": {
+        "value": "#1E88E5",
+        "description": "Information"
+      },
+      "gray": {
+        "50": { "value": "#FAFAFA" },
+        "100": { "value": "#F5F5F5" },
+        "200": { "value": "#EEEEEE" },
+        "300": { "value": "#E0E0E0" },
+        "400": { "value": "#BDBDBD" },
+        "500": { "value": "#9E9E9E" },
+        "600": { "value": "#757575" },
+        "700": { "value": "#616161" },
+        "800": { "value": "#424242" },
+        "900": { "value": "#212121" }
+      },
+      "surface": {
+        "light": {
+          "background": "#FAFAFA",
+          "surface": "#FFFFFF",
+          "elevated": "#FFFFFF"
+        },
+        "dark": {
+          "background": "#121212",
+          "surface": "#1E1E1E",
+          "elevated": "#2C2C2C"
+        }
+      }
+    },
+    "typography": {
+      "fontFamily": {
+        "value": "Manrope",
+        "googleFonts": "https://fonts.google.com/specimen/Manrope"
+      },
+      "display": {
+        "lg": { "size": 57, "weight": 400, "lineHeight": 64, "letterSpacing": -0.25 },
+        "md": { "size": 45, "weight": 400, "lineHeight": 52, "letterSpacing": 0 },
+        "sm": { "size": 36, "weight": 400, "lineHeight": 44, "letterSpacing": 0 }
+      },
+      "headline": {
+        "lg": { "size": 32, "weight": 600, "lineHeight": 40, "letterSpacing": 0 },
+        "md": { "size": 28, "weight": 600, "lineHeight": 36, "letterSpacing": 0 },
+        "sm": { "size": 24, "weight": 600, "lineHeight": 32, "letterSpacing": 0 }
+      },
+      "title": {
+        "lg": { "size": 22, "weight": 600, "lineHeight": 28, "letterSpacing": 0 },
+        "md": { "size": 16, "weight": 600, "lineHeight": 24, "letterSpacing": 0.15 },
+        "sm": { "size": 14, "weight": 600, "lineHeight": 20, "letterSpacing": 0.1 }
+      },
+      "body": {
+        "lg": { "size": 16, "weight": 400, "lineHeight": 24, "letterSpacing": 0.5 },
+        "md": { "size": 14, "weight": 400, "lineHeight": 20, "letterSpacing": 0.25 },
+        "sm": { "size": 12, "weight": 400, "lineHeight": 16, "letterSpacing": 0.4 }
+      },
+      "label": {
+        "lg": { "size": 14, "weight": 500, "lineHeight": 20, "letterSpacing": 0.1 },
+        "md": { "size": 12, "weight": 500, "lineHeight": 16, "letterSpacing": 0.5 },
+        "sm": { "size": 11, "weight": 500, "lineHeight": 16, "letterSpacing": 0.5 }
+      },
+      "amount": {
+        "lg": { "size": 34, "weight": 700, "lineHeight": 42, "letterSpacing": -0.5 },
+        "md": { "size": 24, "weight": 700, "lineHeight": 32, "letterSpacing": -0.25 },
+        "sm": { "size": 18, "weight": 600, "lineHeight": 24, "letterSpacing": 0 }
+      }
+    },
+    "spacing": {
+      "base": 4,
+      "scale": {
+        "1": 4,
+        "2": 8,
+        "3": 12,
+        "4": 16,
+        "5": 20,
+        "6": 24,
+        "8": 32,
+        "10": 40,
+        "12": 48,
+        "16": 64,
+        "20": 80,
+        "24": 96
+      }
+    },
+    "shapes": {
+      "radius": {
+        "none": { "value": 0 },
+        "sm": { "value": 4 },
+        "md": { "value": 8 },
+        "lg": { "value": 12 },
+        "xl": { "value": 16 },
+        "2xl": { "value": 24 },
+        "full": { "value": 9999 }
+      },
+      "shadow": {
+        "none": { "value": "none" },
+        "sm": { "value": "0 1px 2px rgba(0, 0, 0, 0.05)" },
+        "md": { "value": "0 2px 8px rgba(0, 0, 0, 0.08)" },
+        "lg": { "value": "0 4px 16px rgba(0, 0, 0, 0.12)" },
+        "xl": { "value": "0 8px 32px rgba(0, 0, 0, 0.16)" }
+      },
+      "border": {
+        "none": { "value": 0 },
+        "sm": { "value": 1 },
+        "md": { "value": 2 },
+        "lg": { "value": 4 }
+      }
+    }
+  },
+  "components": {
+    "button": {
+      "height": 48,
+      "minWidth": 88,
+      "padding": { "vertical": 12, "horizontal": 24 },
+      "radius": 8,
+      "labelStyle": "label-lg"
+    },
+    "input": {
+      "height": 56,
+      "padding": { "vertical": 12, "horizontal": 16 },
+      "radius": 8,
+      "labelStyle": "label-md"
+    },
+    "card": {
+      "padding": 16,
+      "radius": 12,
+      "shadow": "md"
+    },
+    "bottomNav": {
+      "height": 80,
+      "iconSize": 24,
+      "labelStyle": "label-sm"
+    },
+    "transactionItem": {
+      "height": 72,
+      "iconSize": 40,
+      "padding": 12
+    }
+  },
+  "themes": {
+    "light": {
+      "colors": {
+        "background": "#FAFAFA",
+        "surface": "#FFFFFF",
+        "textPrimary": "#212121",
+        "textSecondary": "#616161",
+        "border": "#E0E0E0"
+      }
+    },
+    "dark": {
+      "colors": {
+        "background": "#121212",
+        "surface": "#1E1E1E",
+        "textPrimary": "#FAFAFA",
+        "textSecondary": "#B0B0B0",
+        "border": "#424242"
+      }
+    }
+  }
+}

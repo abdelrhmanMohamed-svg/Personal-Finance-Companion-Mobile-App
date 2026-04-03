@@ -1,0 +1,156 @@
+{
+  "version": "1.0.0",
+  "name": "personal-finance-companion-design",
+  "description": "Design system export package for Personal Finance Companion Flutter app",
+  "created": "2026-04-04",
+  "exportedFrom": "Google Stitch MCP",
+  "theme": {
+    "name": "Finance Companion Theme",
+    "colors": {
+      "primary": "#2E7D32",
+      "primaryHover": "#1B5E20",
+      "secondary": "#1565C0",
+      "success": "#43A047",
+      "warning": "#F9A825",
+      "error": "#E53935",
+      "info": "#1E88E5"
+    },
+    "typography": {
+      "fontFamily": "Manrope",
+      "googleFonts": "https://fonts.google.com/specimen/Manrope"
+    },
+    "roundness": "ROUND_EIGHT"
+  },
+  "files": [
+    {
+      "type": "token",
+      "name": "colors",
+      "format": "json",
+      "path": "tokens/colors.json"
+    },
+    {
+      "type": "token",
+      "name": "typography",
+      "format": "json",
+      "path": "tokens/typography.json"
+    },
+    {
+      "type": "token",
+      "name": "spacing",
+      "format": "json",
+      "path": "tokens/spacing.json"
+    },
+    {
+      "type": "token",
+      "name": "shapes",
+      "format": "json",
+      "path": "tokens/shapes.json"
+    },
+    {
+      "type": "theme",
+      "name": "light",
+      "format": "json",
+      "path": "themes/light.json"
+    },
+    {
+      "type": "theme",
+      "name": "dark",
+      "format": "json",
+      "path": "themes/dark.json"
+    },
+    {
+      "type": "component",
+      "name": "buttons",
+      "format": "md",
+      "path": "components/buttons.md"
+    },
+    {
+      "type": "component",
+      "name": "inputs",
+      "format": "md",
+      "path": "components/inputs.md"
+    },
+    {
+      "type": "component",
+      "name": "cards",
+      "format": "md",
+      "path": "components/cards.md"
+    },
+    {
+      "type": "component",
+      "name": "feedback",
+      "format": "md",
+      "path": "components/feedback.md"
+    },
+    {
+      "type": "component",
+      "name": "navigation",
+      "format": "md",
+      "path": "components/navigation.md"
+    },
+    {
+      "type": "screen",
+      "name": "dashboard",
+      "format": "md",
+      "path": "screens/dashboard.md"
+    },
+    {
+      "type": "screen",
+      "name": "transactions",
+      "format": "md",
+      "path": "screens/transactions-list.md"
+    },
+    {
+      "type": "screen",
+      "name": "transaction-form",
+      "format": "md",
+      "path": "screens/transaction-form.md"
+    },
+    {
+      "type": "screen",
+      "name": "goals",
+      "format": "md",
+      "path": "screens/goals.md"
+    },
+    {
+      "type": "screen",
+      "name": "insights",
+      "format": "md",
+      "path": "screens/insights.md"
+    },
+    {
+      "type": "screen",
+      "name": "navigation",
+      "format": "md",
+      "path": "screens/navigation.md"
+    },
+    {
+      "type": "state",
+      "name": "loading",
+      "format": "md",
+      "path": "states/loading.md"
+    },
+    {
+      "type": "state",
+      "name": "empty",
+      "format": "md",
+      "path": "states/empty.md"
+    },
+    {
+      "type": "state",
+      "name": "error",
+      "format": "md",
+      "path": "states/error.md"
+    }
+  ],
+  "flutterIntegration": {
+    "themeExtension": true,
+    "widgets": "custom",
+    "tokensImport": "design_tokens.dart"
+  },
+  "notes": [
+    "Design system exported from Google Stitch MCP",
+    "Phase 2.1 - Flutter implementation should use these tokens",
+    "All components follow Material Design 3 guidelines"
+  ]
+}
