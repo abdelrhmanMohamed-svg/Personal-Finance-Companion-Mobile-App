@@ -1,16 +1,124 @@
-# personal_finance_companion_mobile_app
+# Personal Finance Companion - Architecture Documentation
 
-A new Flutter project.
+## Project Structure
 
-## Getting Started
+This project follows a **Feature-based + Clean Architecture** pattern.
 
-This project is a starting point for a Flutter application.
+```
+lib/
+├── main.dart                    # App entry point
+├── app.dart                     # App configuration with routing
+├── core/                        # Core utilities and services
+│   ├── config/                  # Environment configuration
+│   │   └── environment.dart     # Environment enum and settings
+│   ├── constants/               # App-wide constants
+│   │   └── app_constants.dart   # Transaction categories, etc.
+│   ├── cubits/                  # Global Cubit utilities
+│   │   └── app_cubit_observer.dart
+│   ├── services/                # Core services
+│   │   ├── supabase_service.dart
+│   │   └── dependency_injection.dart
+│   ├── theme/                   # Theme configuration
+│   │   ├── app_theme.dart
+│   │   ├── app_colors.dart
+│   │   └── app_typography.dart
+│   └── utils/                   # Utility helpers
+│       └── date_utils.dart
+├── features/                    # Feature modules
+│   ├── auth/
+│   │   ├── data/                # Repositories, data sources
+│   │   ├── domain/             # Entities, use cases
+│   │   └── presentation/       # Screens, widgets, cubits
+│   ├── transactions/
+│   │   ├── data/
+│   │   ├── domain/
+│   │   └── presentation/
+│   ├── dashboard/
+│   │   ├── data/
+│   │   ├── domain/
+│   │   └── presentation/
+│   ├── goals/
+│   │   ├── data/
+│   │   ├── domain/
+│   │   └── presentation/
+│   └── insights/
+│       ├── data/
+│       ├── domain/
+│       └── presentation/
+├── routes/                      # Routing configuration
+│   ├── app_router.dart         # GoRouter configuration
+│   └── route_names.dart        # Route name constants
+└── shared/                      # Shared utilities
+    ├── models/                  # Reusable models
+    └── widgets/                 # Reusable widgets
+```
 
-A few resources to get you started if this is your first Flutter project:
+## Architecture Principles
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### 1. Feature-Based Organization
+- Each feature (auth, transactions, dashboard, goals, insights) has its own folder
+- Features are independent and can be developed in parallel
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### 2. Clean Architecture Layers
+Each feature follows:
+- **data/**: Repositories, data sources, API clients
+- **domain/**: Entities, use cases, business logic
+- **presentation/**: UI screens, widgets, Cubits (state management)
+
+### 3. State Management
+- Uses **Cubit** pattern from flutter_bloc
+- One Cubit per feature
+- States are Equatable for efficient rebuilds
+
+### 4. Dependency Injection
+- Uses **get_it** for service locator
+- All services are registered in `dependency_injection.dart`
+
+### 5. Routing
+- Uses **go_router** for declarative routing
+- Route names defined in `route_names.dart`
+
+## Core Services
+
+### Supabase Service
+- Handles Supabase client initialization
+- Provides authentication methods
+- Manages database connections
+
+### Environment Configuration
+- Supports dev, staging, prod environments
+- Configurable Supabase URL and anon key
+- Debug mode toggle
+
+## Theme System
+
+- Uses Material Design 3
+- Light and dark theme support
+- Custom colors, typography defined in core/theme/
+
+## Naming Conventions
+
+- **Files**: snake_case (e.g., `auth_cubit.dart`)
+- **Classes**: PascalCase (e.g., `AuthCubit`)
+- **Constants**: PascalCase with prefix (e.g., `AppConstants`)
+- **Routes**: camelCase route names in `route_names.dart`
+
+## Development Workflow
+
+1. **Create feature folder**: Add new feature under `lib/features/`
+2. **Implement layers**: Add data, domain, presentation subfolders
+3. **Create Cubit**: Add state and cubit classes for state management
+4. **Register services**: Add any new services to dependency_injection.dart
+5. **Add routes**: Register new screens in app_router.dart
+
+## Testing
+
+- Unit tests: `test/unit/`
+- Widget tests: `test/widget/`
+- Integration tests: `test/integration/`
+
+## Notes
+
+- Placeholder screens will be replaced with UI from Google Stitch
+- Supabase credentials should be in .env file (not committed)
+- Run `flutter pub get` after any pubspec.yaml changes
