@@ -101,22 +101,46 @@ Set up a clean and scalable project structure.
 
 ---
 
-### Phase 2: Design System and Core UI
+### Phase 2.0: UI/UX Design Generation (Google Stitch)
 
-#### Objective
-Create reusable UI components and a consistent design system.
+Objective
+Generate a complete and consistent UI/UX system using Google Stitch MCP.
 
-#### Deliverables
-- App theme (colors, typography)
-- Reusable widgets (buttons, inputs, cards)
-- Layout structure
+Deliverables
 
-#### Spec Content
-- Design tokens
-- Component definitions
-- Spacing system
-- Responsive behavior rules
+Full design system (colors, typography, spacing)
+Reusable UI components
+All app screens (dashboard, transactions, add/edit, goals, insights)
+UI states (loading, empty, error)
 
+Spec Content
+
+Design principles (simple, clean, mobile-first)
+Stitch generation strategy (system + components + screens)
+Design tokens definition
+Component list
+Screen structure
+Responsiveness considerations
+----
+### Phase 2.1: UI Implementation (Flutter)
+
+Objective
+Implement the generated UI in Flutter using reusable components and ScreenUtil.
+
+Deliverables
+
+App theme (tokens applied)
+Reusable widgets (buttons, inputs, cards)
+Responsive UI using ScreenUtil
+All screens built from components
+
+Spec Content
+
+Mapping design → Flutter
+Component implementation
+Layout rules
+Responsive rules (ScreenUtil)
+UI structure (feature-based)
 ---
 
 ### Phase 3: Authentication (Supabase)
