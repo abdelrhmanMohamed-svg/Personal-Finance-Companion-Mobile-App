@@ -2,23 +2,14 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "C/C++ Runner: Debug Session",
-      "type": "cppdbg",
+      "name": "Flutter (Debug)",
+      "type": "dart",
       "request": "launch",
-      "args": [],
-      "stopAtEntry": false,
-      "externalConsole": true,
-      "cwd": "c:/rich_Sonic/personal_finance_companion_mobile_app/windows/flutter",
-      "program": "c:/rich_Sonic/personal_finance_companion_mobile_app/windows/flutter/build/Debug/outDebug",
-      "MIMode": "gdb",
-      "miDebuggerPath": "gdb",
-      "setupCommands": [
-        {
-          "description": "Enable pretty-printing for gdb",
-          "text": "-enable-pretty-printing",
-          "ignoreFailures": true
-        }
-      ]
-    }
+      "program": "lib/main.dart",
+      "args": []
+    },
+    "flutter": [
+      "debug"
+    ]
   ]
 }

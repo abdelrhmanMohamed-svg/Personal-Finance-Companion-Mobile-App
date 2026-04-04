@@ -16,26 +16,26 @@ class Environment {
   });
 
   static Environment get development => const Environment(
-        environment: AppEnvironment.dev,
-        supabaseUrl: '',
-        supabaseAnonKey: '',
-        supabaseDebug: true,
-        isProduction: false,
-      );
+    environment: AppEnvironment.dev,
+    supabaseUrl: 'https://vzqaguiustzukunpdvpv.supabase.co',
+    supabaseAnonKey: 'sb_publishable_wvrVRawtUGRu6NYDYndQpQ_kAVlDT_i',
+    supabaseDebug: true,
+    isProduction: false,
+  );
 
   static Environment get staging => const Environment(
-        environment: AppEnvironment.staging,
-        supabaseUrl: '',
-        supabaseAnonKey: '',
-        supabaseDebug: true,
-        isProduction: false,
-      );
+    environment: AppEnvironment.staging,
+    supabaseUrl: '',
+    supabaseAnonKey: '',
+    supabaseDebug: true,
+    isProduction: false,
+  );
 
   static Environment get production => const Environment(
-        environment: AppEnvironment.prod,
-        supabaseUrl: '',
-        supabaseAnonKey: '',
-        supabaseDebug: false,
-        isProduction: true,
-      );
+    environment: AppEnvironment.prod,
+    supabaseUrl: '',
+    supabaseAnonKey: '',
+    supabaseDebug: false,
+    isProduction: true,
+  );
 }

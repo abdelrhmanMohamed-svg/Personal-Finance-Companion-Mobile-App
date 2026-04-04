@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'app.dart';
 import 'core/services/dependency_injection.dart';
 import 'core/cubits/app_cubit_observer.dart';
@@ -11,5 +12,14 @@ void main() async {
 
   Bloc.observer = AppCubitObserver();
 
-  runApp(const PersonalFinanceApp());
+  runApp(
+    ScreenUtilInit(
+      designSize: const Size(375, 812),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (context, child) {
+        return const PersonalFinanceApp();
+      },
+    ),
+  );
 }
