@@ -10,23 +10,20 @@ import '../../../../shared/widgets/app_text.dart';
 import '../cubits/auth_cubit.dart';
 import '../cubits/auth_state.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class ForgotPasswordScreen extends StatefulWidget {
+  const ForgotPasswordScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _obscurePassword = true;
 
   @override
   void dispose() {
     _emailController.dispose();
-    _passwordController.dispose();
     super.dispose();
   }
 
@@ -65,19 +62,24 @@ class _LoginScreenState extends State<LoginScreen> {
             color: AppColors.primaryContainer,
             borderRadius: BorderRadius.circular(16.r),
           ),
-          child: Icon(Icons.eco_rounded, color: AppColors.primary, size: 32.w),
+          child: Icon(
+            Icons.lock_reset_rounded,
+            color: AppColors.primary,
+            size: 32.w,
+          ),
         ),
         SizedBox(height: 24.h),
         AppText(
-          text: 'Welcome Back',
+          text: 'Reset Password',
           variant: AppTextVariant.headline,
           fontWeight: FontWeight.w800,
         ),
         SizedBox(height: 8.h),
         AppText(
-          text: 'Sign in to continue managing your finances',
+          text: 'Enter your email to receive a password reset link',
           variant: AppTextVariant.body,
           color: AppColors.onSurfaceVariant,
+          textAlign: TextAlign.center,
         ),
       ],
     );
@@ -100,16 +102,8 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Column(
         children: [
           _buildEmailField(),
-          SizedBox(height: 20.h),
-          _buildPasswordField(),
-          SizedBox(height: 16.h),
-          _buildForgotPassword(),
           SizedBox(height: 24.h),
-          _buildLoginButton(),
-          SizedBox(height: 24.h),
-          _buildDivider(),
-          SizedBox(height: 15.h),
-          _buildSocialLogin(),
+          _buildResetButton(),
         ],
       ),
     );
@@ -130,46 +124,10 @@ class _LoginScreenState extends State<LoginScreen> {
           controller: _emailController,
           hint: 'name@example.com',
           keyboardType: TextInputType.emailAddress,
-          textInputAction: TextInputAction.next,
+          textInputAction: TextInputAction.done,
           prefixIcon: Icons.mail_outlined,
           validator: (value) {
             return Validators.validateEmail(value);
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPasswordField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        AppText(
-          text: 'Password',
-          variant: AppTextVariant.label,
-          fontWeight: FontWeight.w700,
-          color: AppColors.onSurfaceVariant,
-        ),
-        SizedBox(height: 8.h),
-        _buildStyledInput(
-          controller: _passwordController,
-          hint: '••••••••',
-          obscureText: _obscurePassword,
-          textInputAction: TextInputAction.done,
-          prefixIcon: Icons.lock_outlined,
-          suffixIcon: IconButton(
-            icon: Icon(
-              _obscurePassword
-                  ? Icons.visibility_off_outlined
-                  : Icons.visibility_outlined,
-              color: AppColors.onSurfaceVariant,
-              size: 20.w,
-            ),
-            onPressed: () =>
-                setState(() => _obscurePassword = !_obscurePassword),
-          ),
-          validator: (value) {
-            return Validators.validatePassword(value);
           },
         ),
       ],
@@ -217,26 +175,17 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildForgotPassword() {
-    return Align(
-      alignment: Alignment.centerRight,
-      child: GestureDetector(
-        onTap: () => context.push('/forgot-password'),
-        child: AppText(
-          text: 'Forgot Password?',
-          variant: AppTextVariant.label,
-          fontWeight: FontWeight.w700,
-          color: AppColors.primary,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLoginButton() {
+  Widget _buildResetButton() {
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
-        if (state is AuthAuthenticated) {
-          context.go('/dashboard');
+        if (state is AuthPasswordResetSent) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Password reset link sent to your email'),
+              backgroundColor: AppColors.primary,
+            ),
+          );
+          context.go('/login');
         } else if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -249,15 +198,14 @@ class _LoginScreenState extends State<LoginScreen> {
       builder: (context, state) {
         final isLoading = state is AuthLoading;
         return AppButton(
-          text: 'Sign In',
-          icon: Icons.arrow_forward_rounded,
+          text: 'Send Reset Link',
+          icon: Icons.send_rounded,
           isFullWidth: true,
           isLoading: isLoading,
           onPressed: () {
             if (_formKey.currentState!.validate()) {
-              context.read<AuthCubit>().signIn(
+              context.read<AuthCubit>().resetPassword(
                     _emailController.text.trim(),
-                    _passwordController.text,
                   );
             }
           },
@@ -266,47 +214,19 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildDivider() {
-    return Row(
-      children: [
-        Expanded(child: Divider(color: AppColors.surfaceContainer)),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
-          child: AppText(
-            text: 'or',
-            variant: AppTextVariant.label,
-            fontWeight: FontWeight.w700,
-            color: AppColors.outline,
-          ),
-        ),
-        Expanded(child: Divider(color: AppColors.surfaceContainer)),
-      ],
-    );
-  }
-
-  Widget _buildSocialLogin() {
-    return AppButton(
-      text: 'Google',
-      icon: Icons.g_mobiledata_rounded,
-      variant: AppButtonVariant.outlined,
-      isFullWidth: true,
-      onPressed: () {},
-    );
-  }
-
   Widget _buildFooter() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         AppText(
-          text: "Don't have an account?",
+          text: 'Remember your password?',
           variant: AppTextVariant.body,
           color: AppColors.onSurfaceVariant,
         ),
         GestureDetector(
-          onTap: () => context.push('/register'),
+          onTap: () => context.go('/login'),
           child: AppText(
-            text: 'Sign Up',
+            text: 'Login',
             variant: AppTextVariant.body,
             color: AppColors.primary,
             fontWeight: FontWeight.w700,

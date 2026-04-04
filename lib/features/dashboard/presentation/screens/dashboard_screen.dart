@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/app_text.dart';
+import '../../../auth/presentation/cubits/auth_cubit.dart';
 
 class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({Key? key}) : super(key: key);
+  const DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -37,20 +40,50 @@ class DashboardScreen extends StatelessWidget {
   }
 
   Widget _buildHeader(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        AppText(
-          text: 'Good morning',
-          variant: AppTextVariant.label,
-          color: AppColors.textSecondary,
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AppText(
+              text: 'Good morning',
+              variant: AppTextVariant.label,
+              color: AppColors.textSecondary,
+            ),
+            SizedBox(height: 4.h),
+            AppText(text: 'Your Finances', variant: AppTextVariant.headline),
+          ],
         ),
-        SizedBox(height: 4.h),
-        AppText(
-          text: 'Your Finances',
-          variant: AppTextVariant.headline,
+        IconButton(
+          icon: Icon(Icons.logout, color: AppColors.textSecondary),
+          onPressed: () => _showLogoutDialog(context),
         ),
       ],
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              context.read<AuthCubit>().signOut();
+              context.go('/login');
+            },
+            child: const Text('Logout'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -70,13 +103,13 @@ class DashboardScreen extends StatelessWidget {
           children: [
             Expanded(
               child: AppButton(
-                text: 'Add Transaction',
+                text: 'Add ',
                 icon: Icons.add_rounded,
                 onPressed: () => context.push('/transactions/add'),
                 isFullWidth: true,
               ),
             ),
-            SizedBox(width: 12.w),
+            SizedBox(width: 10.w),
             Expanded(
               child: AppButton(
                 text: 'Set Goal',
@@ -99,10 +132,7 @@ class DashboardScreen extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            AppText(
-              text: 'Recent Transactions',
-              variant: AppTextVariant.title,
-            ),
+            AppText(text: 'Recent Transactions', variant: AppTextVariant.title),
             TextButton(
               onPressed: () => context.push('/transactions'),
               child: AppText(
@@ -185,7 +215,7 @@ class DashboardScreen extends StatelessWidget {
 }
 
 class BalanceCard extends StatelessWidget {
-  const BalanceCard({Key? key}) : super(key: key);
+  const BalanceCard({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -255,7 +285,7 @@ class BalanceCard extends StatelessWidget {
 }
 
 class IncomeExpenseCard extends StatelessWidget {
-  const IncomeExpenseCard({Key? key}) : super(key: key);
+  const IncomeExpenseCard({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -311,11 +341,7 @@ class IncomeExpenseCard extends StatelessWidget {
             color: AppColors.textSecondary,
           ),
           SizedBox(height: 4.h),
-          AppText(
-            text: amount,
-            variant: AppTextVariant.title,
-            color: color,
-          ),
+          AppText(text: amount, variant: AppTextVariant.title, color: color),
         ],
       ),
     );

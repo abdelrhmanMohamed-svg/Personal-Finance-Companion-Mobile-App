@@ -1,10 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'route_names.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
   debugLogDiagnostics: true,
+  redirect: (context, state) {
+    final isLoggedIn = Supabase.instance.client.auth.currentSession != null;
+    final isAuthRoute = state.matchedLocation == '/login' ||
+        state.matchedLocation == '/register' ||
+        state.matchedLocation == '/forgot-password';
+
+    if (!isLoggedIn && !isAuthRoute) {
+      return '/login';
+    }
+
+    if (isLoggedIn && isAuthRoute) {
+      return '/dashboard';
+    }
+
+    return null;
+  },
   routes: [
     GoRoute(
       path: '/',
@@ -30,6 +47,15 @@ final appRouter = GoRouter(
       builder: (context, state) => const Scaffold(
         body: Center(
           child: Text('Register Screen'),
+        ),
+      ),
+    ),
+    GoRoute(
+      path: '/forgot-password',
+      name: RouteNames.forgotPassword,
+      builder: (context, state) => const Scaffold(
+        body: Center(
+          child: Text('Forgot Password Screen'),
         ),
       ),
     ),

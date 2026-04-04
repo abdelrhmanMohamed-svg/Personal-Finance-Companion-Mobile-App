@@ -9,4 +9,5 @@ class RouteNames {
   static const String goals = 'goals';
   static const String insights = 'insights';
   static const String settings = 'settings';
+  static const String forgotPassword = 'forgotPassword';
 }

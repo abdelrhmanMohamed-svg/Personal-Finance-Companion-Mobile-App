@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/utils/validators.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text.dart';
+import '../cubits/auth_cubit.dart';
+import '../cubits/auth_state.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({Key? key}) : super(key: key);
+  const RegisterScreen({super.key});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -147,7 +152,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         SizedBox(height: 8.h),
         _buildStyledInput(
           controller: _nameController,
-          hint: 'Johnathan Evergreen',
+          hint: "John Doe",
           textInputAction: TextInputAction.next,
           prefixIcon: Icons.person_outlined,
           validator: (value) {
@@ -166,7 +171,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         AppText(
-          text: 'Email Address',
+          text: "Email Address",
           variant: AppTextVariant.label,
           fontWeight: FontWeight.w700,
           color: AppColors.onSurfaceVariant,
@@ -174,18 +179,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
         SizedBox(height: 8.h),
         _buildStyledInput(
           controller: _emailController,
-          hint: 'vault@editorial.finance',
+          hint: 'Enter your email address',
           keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.next,
           prefixIcon: Icons.mail_outlined,
           validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Please enter your email';
-            }
-            if (!value.contains('@')) {
-              return 'Please enter a valid email';
-            }
-            return null;
+            return Validators.validateEmail(value);
           },
         ),
       ],
@@ -221,13 +220,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 setState(() => _obscurePassword = !_obscurePassword),
           ),
           validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Please enter a password';
-            }
-            if (value.length < 6) {
-              return 'Password must be at least 6 characters';
-            }
-            return null;
+            return Validators.validatePassword(value);
           },
         ),
       ],
@@ -255,19 +248,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
         keyboardType: keyboardType,
         textInputAction: textInputAction,
         validator: validator,
-        style: TextStyle(
-          color: AppColors.onSurface,
-          fontSize: 16.sp,
-        ),
+        style: TextStyle(color: AppColors.onSurface, fontSize: 16.sp),
         decoration: InputDecoration(
           hintText: hint,
           hintStyle: TextStyle(color: AppColors.outline),
-          prefixIcon:
-              Icon(prefixIcon, color: AppColors.onSurfaceVariant, size: 20.w),
+          prefixIcon: Icon(
+            prefixIcon,
+            color: AppColors.onSurfaceVariant,
+            size: 20.w,
+          ),
           suffixIcon: suffixIcon,
           border: InputBorder.none,
-          contentPadding:
-              EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: 16.w,
+            vertical: 14.h,
+          ),
         ),
       ),
     );
@@ -308,17 +303,39 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Widget _buildRegisterButton() {
-    return AppButton(
-      text: 'Create Account',
-      icon: Icons.arrow_forward_rounded,
-      isFullWidth: true,
-      onPressed: _acceptTerms
-          ? () {
-              if (_formKey.currentState!.validate()) {
-                context.go('/');
-              }
-            }
-          : null,
+    return BlocConsumer<AuthCubit, AuthState>(
+      listener: (context, state) {
+        if (state is AuthAuthenticated) {
+          context.go('/dashboard');
+        } else if (state is AuthError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error: ${state.message}'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+      },
+      builder: (context, state) {
+        final isLoading = state is AuthLoading;
+        return AppButton(
+          text: 'Create Account',
+          icon: Icons.arrow_forward_rounded,
+          isFullWidth: true,
+          isLoading: isLoading,
+          onPressed: _acceptTerms
+              ? () {
+                  if (_formKey.currentState!.validate()) {
+                    context.read<AuthCubit>().signUp(
+                      _emailController.text.trim(),
+                      _passwordController.text,
+                      displayName: _nameController.text.trim(),
+                    );
+                  }
+                }
+              : null,
+        );
+      },
     );
   }
 
@@ -329,14 +346,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             AppText(
-              text: 'Already an owner?',
+              text: 'Already have an account?',
               variant: AppTextVariant.body,
               color: AppColors.onSurfaceVariant,
             ),
             GestureDetector(
               onTap: () => context.pop(),
               child: AppText(
-                text: 'Login to Vault',
+                text: 'Login',
                 variant: AppTextVariant.body,
                 color: AppColors.primary,
                 fontWeight: FontWeight.w700,
@@ -364,9 +381,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget _buildBadge(IconData icon, String text) {
     return Row(
       children: [
-        Icon(icon,
-            color: AppColors.onSurfaceVariant.withValues(alpha: 0.6),
-            size: 14.w),
+        Icon(
+          icon,
+          color: AppColors.onSurfaceVariant.withValues(alpha: 0.6),
+          size: 14.w,
+        ),
         SizedBox(width: 4.w),
         AppText(
           text: text,
