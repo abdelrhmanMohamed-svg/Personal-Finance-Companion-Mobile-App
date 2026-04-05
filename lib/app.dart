@@ -18,6 +18,7 @@ import 'core/services/dependency_injection.dart';
 import 'core/services/supabase_service.dart';
 import 'core/theme/app_theme.dart';
 import 'features/transactions/presentation/cubits/transactions_cubit.dart';
+import 'features/dashboard/presentation/cubit/dashboard_cubit.dart';
 
 class PersonalFinanceApp extends StatelessWidget {
   const PersonalFinanceApp({super.key});
@@ -34,6 +35,9 @@ class PersonalFinanceApp extends StatelessWidget {
             getIt(),
             getIt(),
           ),
+        ),
+        BlocProvider<DashboardCubit>(
+          create: (_) => getIt<DashboardCubit>(),
         ),
       ],
       child: BlocListener<AuthCubit, auth.AuthState>(

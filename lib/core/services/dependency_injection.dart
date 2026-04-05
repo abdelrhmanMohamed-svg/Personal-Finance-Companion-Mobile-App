@@ -5,6 +5,11 @@ import 'supabase_service.dart';
 import '../../features/transactions/data/repositories/transaction_repository_impl.dart';
 import '../../features/transactions/domain/repositories/transaction_repository.dart';
 import '../../features/transactions/presentation/cubits/transactions_cubit.dart';
+import '../../features/dashboard/data/datasources/dashboard_datasource.dart';
+import '../../features/dashboard/data/repositories/dashboard_repository_impl.dart';
+import '../../features/dashboard/domain/repositories/dashboard_repository.dart';
+import '../../features/dashboard/domain/usecases/get_dashboard_summary.dart';
+import '../../features/dashboard/presentation/cubit/dashboard_cubit.dart';
 
 final getIt = GetIt.instance;
 
@@ -28,6 +33,25 @@ Future<void> setupDependencies() async {
     () => TransactionsCubit(
       getIt<TransactionRepository>(),
       getIt<SupabaseClient>(),
+    ),
+  );
+
+  getIt.registerLazySingleton<DashboardDataSource>(
+    () => DashboardDataSource(getIt<SupabaseClient>()),
+  );
+
+  getIt.registerLazySingleton<DashboardRepository>(
+    () => DashboardRepositoryImpl(getIt<DashboardDataSource>()),
+  );
+
+  getIt.registerFactory<GetDashboardSummary>(
+    () => GetDashboardSummary(getIt<DashboardRepository>()),
+  );
+
+  getIt.registerFactory<DashboardCubit>(
+    () => DashboardCubit(
+      getDashboardSummary: getIt<GetDashboardSummary>(),
+      supabaseClient: getIt<SupabaseClient>(),
     ),
   );
 }

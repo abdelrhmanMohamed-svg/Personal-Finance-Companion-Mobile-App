@@ -8,38 +8,244 @@ import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/app_text.dart';
 import '../../../auth/presentation/cubits/auth_cubit.dart';
+import '../../domain/entities/dashboard_entity.dart';
+import '../cubit/dashboard_cubit.dart';
+import '../cubit/dashboard_state.dart';
+import '../widgets/balance_card.dart';
+import '../widgets/empty_state_widget.dart';
+import '../widgets/error_state_widget.dart';
+import '../widgets/income_expense_row.dart';
+import '../widgets/summary_card.dart';
+import '../widgets/savings_goals_widget.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
   @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    context.read<DashboardCubit>().loadDashboard();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      context.read<DashboardCubit>().refreshDashboard();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.all(20.w),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(context),
-              SizedBox(height: 24.h),
-              const BalanceCard(),
-              SizedBox(height: 16.h),
-              const IncomeExpenseCard(),
-              SizedBox(height: 24.h),
-              _buildQuickActions(context),
-              SizedBox(height: 24.h),
-              _buildRecentTransactions(context),
-            ],
+    return RefreshIndicator(
+      onRefresh: () async => context.read<DashboardCubit>().refreshDashboard(),
+
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: SafeArea(
+          child: BlocBuilder<DashboardCubit, DashboardState>(
+            builder: (context, state) {
+              if (state is DashboardLoading) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              if (state is DashboardEmpty) {
+                return SingleChildScrollView(
+                  padding: EdgeInsets.all(20.w),
+                  child: Column(
+                    children: [
+                      _buildHeader(context),
+                      SizedBox(height: 24.h),
+                      const EmptyStateWidget(),
+                      SizedBox(height: 24.h),
+                      _buildQuickActions(context),
+                    ],
+                  ),
+                );
+              }
+
+              if (state is DashboardError) {
+                return SingleChildScrollView(
+                  padding: EdgeInsets.all(20.w),
+                  child: Column(
+                    children: [
+                      _buildHeader(context),
+                      SizedBox(height: 24.h),
+                      ErrorStateWidget(
+                        message: state.message,
+                        onRetry: () =>
+                            context.read<DashboardCubit>().loadDashboard(),
+                      ),
+                      SizedBox(height: 24.h),
+                      _buildQuickActions(context),
+                    ],
+                  ),
+                );
+              }
+
+              if (state is DashboardLoaded) {
+                return _buildLoadedContent(context, state.dashboard);
+              }
+
+              return const Center(child: CircularProgressIndicator());
+            },
           ),
         ),
+        bottomNavigationBar: _buildBottomNav(context),
       ),
-      bottomNavigationBar: _buildBottomNav(context),
+    );
+  }
+
+  Widget _buildLoadedContent(BuildContext context, DashboardEntity dashboard) {
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(20.w),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildHeader(context),
+          SizedBox(height: 24.h),
+          BalanceCard(balance: dashboard.currentBalance),
+          SizedBox(height: 16.h),
+          IncomeExpenseRow(
+            totalIncome: dashboard.totalIncome,
+            totalExpenses: dashboard.totalExpenses,
+          ),
+          SizedBox(height: 24.h),
+          SavingsGoalsWidget(
+            goals: const [
+              GoalData(
+                title: 'Vacation in Bali',
+                targetAmount: 4000,
+                savedAmount: 3000,
+                progress: 0.75,
+                icon: Icons.beach_access_rounded,
+              ),
+              GoalData(
+                title: 'New Car',
+                targetAmount: 25000,
+                savedAmount: 8500,
+                progress: 0.34,
+                icon: Icons.directions_car_rounded,
+              ),
+            ],
+            onTap: () => context.push('/goals'),
+          ),
+          SizedBox(height: 24.h),
+          _buildViewInsights(context),
+          SizedBox(height: 24.h),
+          _buildQuickActions(context),
+          SizedBox(height: 24.h),
+          _buildRecentTransactions(context),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSummaryCards(DashboardEntity dashboard) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AppText(
+          text: 'SUMMARY',
+          variant: AppTextVariant.caption,
+          color: AppColors.textSecondary,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 1.5,
+        ),
+        SizedBox(height: 12.h),
+        Row(
+          children: [
+            Expanded(
+              child: SummaryCard(
+                title: 'Balance',
+                value: dashboard.currentBalance,
+                icon: Icons.account_balance_wallet,
+                color: dashboard.currentBalance >= 0
+                    ? Colors.green
+                    : Colors.red,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 12.h),
+        Row(
+          children: [
+            Expanded(
+              child: SummaryCard(
+                title: 'Income',
+                value: dashboard.totalIncome,
+                icon: Icons.arrow_downward,
+                color: Colors.green,
+              ),
+            ),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: SummaryCard(
+                title: 'Expenses',
+                value: dashboard.totalExpenses,
+                icon: Icons.arrow_upward,
+                color: Colors.red,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildViewInsights(BuildContext context) {
+    return GestureDetector(
+      onTap: () => context.push('/insights'),
+      child: Container(
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: AppColors.primary.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(12.r),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.insights, color: AppColors.primary, size: 24.w),
+                SizedBox(width: 12.w),
+                AppText(
+                  text: 'View Detailed Insights',
+                  variant: AppTextVariant.body,
+                  color: AppColors.primary,
+                ),
+              ],
+            ),
+            Icon(Icons.chevron_right, color: AppColors.primary),
+          ],
+        ),
+      ),
     );
   }
 
   Widget _buildHeader(BuildContext context) {
+    final hour = DateTime.now().hour;
+    String greeting;
+    if (hour < 12) {
+      greeting = 'Good morning';
+    } else if (hour < 17) {
+      greeting = 'Good afternoon';
+    } else {
+      greeting = 'Good evening';
+    }
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -47,7 +253,7 @@ class DashboardScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             AppText(
-              text: 'Good morning',
+              text: greeting,
               variant: AppTextVariant.label,
               color: AppColors.textSecondary,
             ),
@@ -103,7 +309,7 @@ class DashboardScreen extends StatelessWidget {
           children: [
             Expanded(
               child: AppButton(
-                text: 'Add ',
+                text: 'Add',
                 icon: Icons.add_rounded,
                 onPressed: () => context.push('/transactions/add'),
                 isFullWidth: true,
@@ -190,159 +396,25 @@ class DashboardScreen extends StatelessWidget {
                 break;
             }
           },
-          items: [
+          items: const [
             BottomNavigationBarItem(
-              icon: const Icon(Icons.dashboard_rounded),
+              icon: Icon(Icons.dashboard_rounded),
               label: 'Dashboard',
             ),
             BottomNavigationBarItem(
-              icon: const Icon(Icons.receipt_long_rounded),
+              icon: Icon(Icons.receipt_long_rounded),
               label: 'Transactions',
             ),
             BottomNavigationBarItem(
-              icon: const Icon(Icons.flag_rounded),
+              icon: Icon(Icons.flag_rounded),
               label: 'Goals',
             ),
             BottomNavigationBarItem(
-              icon: const Icon(Icons.insights_rounded),
+              icon: Icon(Icons.insights_rounded),
               label: 'Insights',
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class BalanceCard extends StatelessWidget {
-  const BalanceCard({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(24.w),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppColors.primary, AppColors.primaryLight],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(24.r),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          AppText(
-            text: 'Total Balance',
-            variant: AppTextVariant.label,
-            color: AppColors.onPrimary.withValues(alpha: 0.7),
-          ),
-          SizedBox(height: 8.h),
-          AppText(
-            text: '\$0.00',
-            variant: AppTextVariant.headline,
-            color: AppColors.onPrimary,
-            fontSize: 36.sp,
-          ),
-          SizedBox(height: 20.h),
-          Row(
-            children: [
-              _buildTrendIndicator(
-                Icons.arrow_upward_rounded,
-                '+\$0.00',
-                AppColors.onPrimary,
-              ),
-              SizedBox(width: 24.w),
-              _buildTrendIndicator(
-                Icons.arrow_downward_rounded,
-                '-\$0.00',
-                AppColors.onPrimary.withValues(alpha: 0.7),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTrendIndicator(IconData icon, String text, Color color) {
-    return Row(
-      children: [
-        Icon(icon, color: color, size: 16.w),
-        SizedBox(width: 4.w),
-        Text(
-          text,
-          style: TextStyle(
-            color: color,
-            fontSize: 12.sp,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class IncomeExpenseCard extends StatelessWidget {
-  const IncomeExpenseCard({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildSummaryCard(
-            context,
-            'Income',
-            '\$0.00',
-            Icons.arrow_downward_rounded,
-            AppColors.income,
-          ),
-        ),
-        SizedBox(width: 12.w),
-        Expanded(
-          child: _buildSummaryCard(
-            context,
-            'Expenses',
-            '\$0.00',
-            Icons.arrow_upward_rounded,
-            AppColors.expense,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSummaryCard(
-    BuildContext context,
-    String title,
-    String amount,
-    IconData icon,
-    Color color,
-  ) {
-    return AppCard(
-      padding: EdgeInsets.all(20.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: EdgeInsets.all(8.w),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-            child: Icon(icon, color: color, size: 20.w),
-          ),
-          SizedBox(height: 12.h),
-          AppText(
-            text: title,
-            variant: AppTextVariant.caption,
-            color: AppColors.textSecondary,
-          ),
-          SizedBox(height: 4.h),
-          AppText(text: amount, variant: AppTextVariant.title, color: color),
-        ],
       ),
     );
   }

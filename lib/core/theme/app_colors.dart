@@ -10,6 +10,7 @@ class AppColors {
   static const Color secondaryDark = Color(0xFF005c3d);
 
   static const Color tertiary = Color(0xFF006576);
+  static const Color tertiaryLight = Color(0xFFFB5151);
 
   static const Color success = Color(0xFF006a35);
   static const Color warning = Color(0xFF006946);
@@ -42,5 +43,8 @@ class AppColors {
   static const Color onPrimaryContainer = Color(0xFF005f2f);
 
   static const Color income = Color(0xFF006a35);
+  static const Color incomeIcon = Color(0xFF005F2F);
+  static const Color incomeBg = Color(0xFF6BFE9C);
   static const Color expense = Color(0xFFb31b25);
+  static const Color expenseIcon = Color(0xFFB31B25);
 }
