@@ -15,6 +15,10 @@ import '../../features/goals/data/datasources/goals_datasource.dart';
 import '../../features/goals/data/repositories/goals_repository_impl.dart';
 import '../../features/goals/domain/repositories/goals_repository.dart';
 import '../../features/goals/presentation/cubit/goals_cubit.dart';
+import '../../features/insights/data/datasources/insights_datasource.dart';
+import '../../features/insights/data/repositories/insights_repository_impl.dart';
+import '../../features/insights/domain/repositories/insights_repository.dart';
+import '../../features/insights/presentation/cubit/insights_cubit.dart';
 
 final getIt = GetIt.instance;
 
@@ -77,6 +81,21 @@ Future<void> setupDependencies() async {
   getIt.registerFactory<GoalsCubit>(
     () => GoalsCubit(
       goalsRepository: getIt<GoalsRepository>(),
+      supabaseClient: getIt<SupabaseClient>(),
+    ),
+  );
+
+  getIt.registerLazySingleton<InsightsDataSource>(
+    () => InsightsDataSource(getIt<SupabaseClient>()),
+  );
+
+  getIt.registerLazySingleton<InsightsRepository>(
+    () => InsightsRepositoryImpl(getIt<InsightsDataSource>()),
+  );
+
+  getIt.registerFactory<InsightsCubit>(
+    () => InsightsCubit(
+      insightsRepository: getIt<InsightsRepository>(),
       supabaseClient: getIt<SupabaseClient>(),
     ),
   );
