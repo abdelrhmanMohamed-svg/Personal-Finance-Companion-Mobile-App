@@ -9,6 +9,7 @@ class AuthCubit extends Cubit<AuthState> {
   AuthCubit(this._supabaseService) : super(const AuthInitial());
 
   Future<void> checkAuthStatus() async {
+    emit(const AuthLoading());
     try {
       if (_supabaseService.isAuthenticated) {
         final user = _supabaseService.currentUser;
@@ -26,14 +27,12 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> signIn(String email, String password) async {
+    emit(const AuthLoading());
     try {
-      emit(const AuthLoading());
-
       final response = await _supabaseService.signInWithPassword(
         email: email,
         password: password,
       );
-
       if (response.user != null) {
         emit(AuthAuthenticated(response.user!.id));
       } else {
@@ -44,21 +43,17 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  Future<void> signUp(String email, String password,
-      {String? displayName}) async {
+  Future<void> signUp(String email, String password) async {
+    emit(const AuthLoading());
     try {
-      emit(const AuthLoading());
-
       final response = await _supabaseService.signUp(
         email: email,
         password: password,
-        displayName: displayName,
       );
-
       if (response.user != null) {
         emit(AuthAuthenticated(response.user!.id));
       } else {
-        emit(const AuthError('Sign up failed - no user returned'));
+        emit(const AuthError('Sign up failed'));
       }
     } catch (e) {
       emit(AuthError(e.toString()));
@@ -96,13 +91,5 @@ class AuthCubit extends Cubit<AuthState> {
 
   String? validatePassword(String password) {
     return Validators.validatePassword(password);
-  }
-
-  void updateAuthState(String userId) {
-    emit(AuthAuthenticated(userId));
-  }
-
-  void emitUnauthenticated() {
-    emit(const AuthUnauthenticated());
   }
 }

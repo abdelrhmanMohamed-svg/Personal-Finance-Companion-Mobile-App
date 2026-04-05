@@ -7,6 +7,10 @@ Auto-generated from all feature plans. Last updated: 2026-04-04
 - N/A (UI-only phase, no persistent data) (003-make-spec-phase)
 - N/A (design-only phase) + Google Stitch MCP for design generation (004-stitch-ui-design)
 - N/A (design output stored in project) (004-stitch-ui-design)
+- Dart 3.x (Flutter 3.x) + flutter_bloc (Cubit), screen_util_flutter, google_fonts, supabase_flutter (005-flutter-ui-implementation)
+- N/A (UI-only phase - no persistent data) (005-flutter-ui-implementation)
+- Dart 3.x with Flutter 3.x + flutter_bloc (Cubit), supabase_flutter, go_router, get_it, equatable, screen_util_flutter, google_fonts (006-supabase-auth)
+- Supabase (Auth + PostgreSQL) (006-supabase-auth)
 
 - Dart 3.x (Flutter 3.x latest stable) + flutter_bloc (Cubit), supabase_flutter, go_router, get_it, equatable (002-project-setup)
 
@@ -26,10 +30,10 @@ tests/
 Dart 3.x (Flutter 3.x latest stable): Follow standard conventions
 
 ## Recent Changes
+- 006-supabase-auth: Added Dart 3.x with Flutter 3.x + flutter_bloc (Cubit), supabase_flutter, go_router, get_it, equatable, screen_util_flutter, google_fonts
+- 005-flutter-ui-implementation: Added Dart 3.x (Flutter 3.x) + flutter_bloc (Cubit), screen_util_flutter, google_fonts, supabase_flutter
 - 004-stitch-ui-design: Added N/A (design-only phase) + Google Stitch MCP for design generation
-- 003-make-spec-phase: Added Dart 3.x (Flutter 3.x latest stable) + flutter_bloc (Cubit), supabase_flutter, go_router, get_it, equatable, screen_util_flutter, google_fonts
 
-- 002-project-setup: Added Dart 3.x (Flutter 3.x latest stable) + flutter_bloc (Cubit), supabase_flutter, go_router, get_it, equatable
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->

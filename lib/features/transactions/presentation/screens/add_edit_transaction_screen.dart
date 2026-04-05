@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_input.dart';
 import '../../../../shared/widgets/app_text.dart';
+import '../../domain/entities/transaction.dart';
+import '../cubits/transactions_cubit.dart';
+import '../cubits/transactions_state.dart';
 
 class AddEditTransactionScreen extends StatefulWidget {
-  const AddEditTransactionScreen({Key? key}) : super(key: key);
+  final Transaction? transaction;
+
+  const AddEditTransactionScreen({Key? key, this.transaction})
+      : super(key: key);
 
   @override
   State<AddEditTransactionScreen> createState() =>
@@ -16,80 +23,162 @@ class AddEditTransactionScreen extends StatefulWidget {
 
 class _AddEditTransactionScreenState extends State<AddEditTransactionScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _amountController = TextEditingController();
-  final _descriptionController = TextEditingController();
+  late final TextEditingController _amountController;
+  late final TextEditingController _descriptionController;
 
-  String _transactionType = 'expense';
-  String _selectedCategory = 'Food';
-  String _selectedAccount = 'Main Wallet';
+  @override
+  void initState() {
+    super.initState();
+    _amountController = TextEditingController();
+    _descriptionController = TextEditingController();
 
-  final List<String> _categories = [
-    'Food',
-    'Transport',
-    'Shopping',
-    'Rent',
-    'Entertainment',
-    'Utilities',
-  ];
+    final cubit = context.read<TransactionsCubit>();
 
-  final List<String> _accounts = [
-    'Main Wallet',
-    'Savings Account',
-    'Investment Fund',
-  ];
+    if (widget.transaction != null) {
+      _amountController.text = widget.transaction!.amount.toString();
+      _descriptionController.text = widget.transaction!.note ?? '';
+      cubit.setTransactionType(widget.transaction!.type);
+      cubit.setCategory(widget.transaction!.category);
+      cubit.setDate(widget.transaction!.date);
+    } else {
+      cubit.resetForm();
+    }
+  }
 
-  final Map<String, IconData> _categoryIcons = {
-    'Food': Icons.restaurant_rounded,
-    'Transport': Icons.directions_car_rounded,
-    'Shopping': Icons.shopping_bag_rounded,
-    'Rent': Icons.home_rounded,
-    'Entertainment': Icons.movie_rounded,
-    'Utilities': Icons.electrical_services_rounded,
-  };
+  @override
+  void dispose() {
+    _amountController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
+  void _saveTransaction(BuildContext context, TransactionFormState formState) {
+    if (_formKey.currentState!.validate()) {
+      final amount = double.parse(_amountController.text);
+      final cubit = context.read<TransactionsCubit>();
+
+      if (widget.transaction != null) {
+        final updated = widget.transaction!.copyWith(
+          amount: amount,
+          type: formState.type,
+          category: formState.category,
+          date: formState.date,
+          note: _descriptionController.text.isNotEmpty
+              ? _descriptionController.text
+              : null,
+        );
+        cubit.updateTransaction(updated);
+      } else {
+        cubit.addTransaction(
+          amount: amount,
+          type: formState.type,
+          category: formState.category,
+          date: formState.date,
+          note: _descriptionController.text.isNotEmpty
+              ? _descriptionController.text
+              : null,
+        );
+      }
+    }
+  }
+
+  List<String> _getCategories(TransactionType type) {
+    return TransactionCategories.getByType(type);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.surface,
-        leading: IconButton(
-          icon: Icon(Icons.close_rounded, color: AppColors.textPrimary),
-          onPressed: () => context.pop(),
-        ),
-        title: AppText(
-          text: 'Add Transaction',
-          variant: AppTextVariant.title,
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(20.w),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildTransactionTypeSelector(),
-              SizedBox(height: 24.h),
-              _buildAmountField(),
-              SizedBox(height: 24.h),
-              _buildDateSelector(),
-              SizedBox(height: 24.h),
-              _buildAccountSelector(),
-              SizedBox(height: 24.h),
-              _buildCategorySelector(),
-              SizedBox(height: 24.h),
-              _buildDescriptionField(),
-              SizedBox(height: 32.h),
-              _buildSaveButton(),
-            ],
+    debugPrint("build");
+    return BlocConsumer<TransactionsCubit, TransactionsState>(
+      listener: (context, state) {
+        if (state is TransactionAdded) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Transaction added successfully')),
+          );
+          context.read<TransactionsCubit>().resetForm();
+          context.pop();
+        } else if (state is TransactionUpdated) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Transaction updated successfully')),
+          );
+          context.read<TransactionsCubit>().resetForm();
+          context.pop();
+        } else if (state is TransactionsError) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message)));
+        }
+      },
+      listenWhen: (previous, current) {
+        return current is TransactionAdded ||
+            current is TransactionUpdated ||
+            current is TransactionsError;
+      },
+      builder: (context, state) {
+        final isLoading = state is TransactionsLoading;
+
+        TransactionFormState formState;
+        if (state is TransactionFormState) {
+          formState = state;
+        } else {
+          formState = TransactionFormState.initial();
+        }
+
+        final categories = _getCategories(formState.type);
+
+        return Scaffold(
+          backgroundColor: AppColors.background,
+          appBar: AppBar(
+            backgroundColor: AppColors.surface,
+            leading: IconButton(
+              icon: Icon(Icons.close_rounded, color: AppColors.textPrimary),
+              onPressed: () {
+                context.read<TransactionsCubit>().resetForm();
+                context.pop();
+              },
+            ),
+            title: AppText(
+              text: widget.transaction != null
+                  ? 'Edit Transaction'
+                  : 'Add Transaction',
+              variant: AppTextVariant.title,
+            ),
           ),
-        ),
-      ),
+          body: SingleChildScrollView(
+            padding: EdgeInsets.all(20.w),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildTransactionTypeSelector(context, formState.type),
+                  SizedBox(height: 24.h),
+                  _buildAmountField(),
+                  SizedBox(height: 24.h),
+                  _buildDateSelector(context, formState.date),
+                  SizedBox(height: 24.h),
+                  _buildCategorySelector(
+                    context,
+                    formState.category,
+                    categories,
+                  ),
+                  SizedBox(height: 24.h),
+                  _buildDescriptionField(),
+                  SizedBox(height: 32.h),
+                  _buildSaveButton(context, formState, isLoading),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildTransactionTypeSelector() {
+  Widget _buildTransactionTypeSelector(
+    BuildContext context,
+    TransactionType currentType,
+  ) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surfaceContainer,
@@ -99,23 +188,34 @@ class _AddEditTransactionScreenState extends State<AddEditTransactionScreen> {
       child: Row(
         children: [
           Expanded(
-            child: _buildTypeButton('expense', 'Expense'),
+            child: _buildTypeButton(
+              context,
+              TransactionType.expense,
+              'Expense',
+              currentType == TransactionType.expense,
+            ),
           ),
           Expanded(
-            child: _buildTypeButton('income', 'Income'),
-          ),
-          Expanded(
-            child: _buildTypeButton('transfer', 'Transfer'),
+            child: _buildTypeButton(
+              context,
+              TransactionType.income,
+              'Income',
+              currentType == TransactionType.income,
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildTypeButton(String type, String label) {
-    final isSelected = _transactionType == type;
+  Widget _buildTypeButton(
+    BuildContext context,
+    TransactionType type,
+    String label,
+    bool isSelected,
+  ) {
     return GestureDetector(
-      onTap: () => setState(() => _transactionType = type),
+      onTap: () => context.read<TransactionsCubit>().setTransactionType(type),
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 12.h),
         decoration: BoxDecoration(
@@ -158,7 +258,7 @@ class _AddEditTransactionScreenState extends State<AddEditTransactionScreen> {
               ),
               SizedBox(width: 8.w),
               Expanded(
-                child: TextField(
+                child: TextFormField(
                   controller: _amountController,
                   keyboardType: TextInputType.number,
                   style: TextStyle(
@@ -173,6 +273,19 @@ class _AddEditTransactionScreenState extends State<AddEditTransactionScreen> {
                     fillColor: Colors.transparent,
                     filled: false,
                   ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Amount is required';
+                    }
+                    final amount = double.tryParse(value);
+                    if (amount == null) {
+                      return 'Please enter a valid number';
+                    }
+                    if (amount <= 0) {
+                      return 'Amount must be greater than zero';
+                    }
+                    return null;
+                  },
                 ),
               ),
             ],
@@ -182,7 +295,7 @@ class _AddEditTransactionScreenState extends State<AddEditTransactionScreen> {
     );
   }
 
-  Widget _buildDateSelector() {
+  Widget _buildDateSelector(BuildContext context, DateTime currentDate) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -192,116 +305,67 @@ class _AddEditTransactionScreenState extends State<AddEditTransactionScreen> {
           color: AppColors.textSecondary,
         ),
         SizedBox(height: 8.h),
-        Container(
-          padding: EdgeInsets.all(16.w),
-          decoration: BoxDecoration(
-            color: AppColors.surfaceContainer,
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-          child: Row(
-            children: [
-              Icon(Icons.calendar_today_rounded,
-                  color: AppColors.primary, size: 20.w),
-              SizedBox(width: 12.w),
-              AppText(
-                text: 'Today',
-                variant: AppTextVariant.body,
-              ),
-              SizedBox(width: 8.w),
-              AppText(
-                text: ', Apr 4, 2026',
-                variant: AppTextVariant.body,
-                color: AppColors.textSecondary,
-              ),
-            ],
+        GestureDetector(
+          onTap: () async {
+            final date = await showDatePicker(
+              context: context,
+              initialDate: currentDate,
+              firstDate: DateTime(2020),
+              lastDate: DateTime.now(),
+            );
+            if (date != null) {
+              context.read<TransactionsCubit>().setDate(date);
+            }
+          },
+          child: Container(
+            padding: EdgeInsets.all(16.w),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceContainer,
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.calendar_today_rounded,
+                  color: AppColors.primary,
+                  size: 20.w,
+                ),
+                SizedBox(width: 12.w),
+                AppText(
+                  text:
+                      '${currentDate.day}/${currentDate.month}/${currentDate.year}',
+                  variant: AppTextVariant.body,
+                ),
+              ],
+            ),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildAccountSelector() {
+  Widget _buildCategorySelector(
+    BuildContext context,
+    String currentCategory,
+    List<String> categories,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         AppText(
-          text: 'From Account',
+          text: 'Category',
           variant: AppTextVariant.label,
           color: AppColors.textSecondary,
-        ),
-        SizedBox(height: 8.h),
-        Container(
-          padding: EdgeInsets.all(16.w),
-          decoration: BoxDecoration(
-            color: AppColors.surfaceContainer,
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-          child: Row(
-            children: [
-              Icon(Icons.account_balance_wallet_rounded,
-                  color: AppColors.primary, size: 20.w),
-              SizedBox(width: 12.w),
-              Expanded(
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    value: _selectedAccount,
-                    isExpanded: true,
-                    icon: Icon(Icons.expand_more_rounded,
-                        color: AppColors.textSecondary),
-                    items: _accounts.map((account) {
-                      return DropdownMenuItem(
-                        value: account,
-                        child: AppText(
-                          text: account,
-                          variant: AppTextVariant.body,
-                        ),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() => _selectedAccount = value);
-                      }
-                    },
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCategorySelector() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            AppText(
-              text: 'Category',
-              variant: AppTextVariant.label,
-              color: AppColors.textSecondary,
-            ),
-            TextButton(
-              onPressed: () {},
-              child: AppText(
-                text: 'View All',
-                variant: AppTextVariant.label,
-                color: AppColors.primary,
-              ),
-            ),
-          ],
         ),
         SizedBox(height: 8.h),
         Wrap(
           spacing: 12.w,
           runSpacing: 12.h,
-          children: _categories.map((category) {
-            final isSelected = _selectedCategory == category;
+          children: categories.map((category) {
+            final isSelected = currentCategory == category;
             return GestureDetector(
-              onTap: () => setState(() => _selectedCategory = category),
+              onTap: () =>
+                  context.read<TransactionsCubit>().setCategory(category),
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
                 decoration: BoxDecoration(
@@ -313,24 +377,11 @@ class _AddEditTransactionScreenState extends State<AddEditTransactionScreen> {
                       ? Border.all(color: AppColors.primary, width: 2)
                       : null,
                 ),
-                child: Column(
-                  children: [
-                    Icon(
-                      _categoryIcons[category],
-                      color: isSelected
-                          ? AppColors.primary
-                          : AppColors.textSecondary,
-                      size: 24.w,
-                    ),
-                    SizedBox(height: 4.h),
-                    AppText(
-                      text: category,
-                      variant: AppTextVariant.caption,
-                      color: isSelected
-                          ? AppColors.primary
-                          : AppColors.textSecondary,
-                    ),
-                  ],
+                child: AppText(
+                  text: category,
+                  variant: AppTextVariant.caption,
+                  color:
+                      isSelected ? AppColors.primary : AppColors.textSecondary,
                 ),
               ),
             );
@@ -349,18 +400,19 @@ class _AddEditTransactionScreenState extends State<AddEditTransactionScreen> {
     );
   }
 
-  Widget _buildSaveButton() {
+  Widget _buildSaveButton(
+    BuildContext context,
+    TransactionFormState formState,
+    bool isLoading,
+  ) {
     return SizedBox(
       width: double.infinity,
       child: AppButton(
-        text: 'Save Transaction',
+        text: isLoading ? 'Saving...' : 'Save Transaction',
         icon: Icons.check_circle_rounded,
-        onPressed: () {
-          if (_formKey.currentState!.validate()) {
-            context.pop();
-          }
-        },
+        onPressed: () => _saveTransaction(context, formState),
         isFullWidth: true,
+        isLoading: isLoading,
       ),
     );
   }

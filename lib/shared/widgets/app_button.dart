@@ -12,14 +12,14 @@ class AppButton extends StatelessWidget {
   final IconData? icon;
 
   const AppButton({
-    Key? key,
+    super.key,
     required this.text,
     this.onPressed,
     this.variant = AppButtonVariant.primary,
     this.isLoading = false,
     this.isFullWidth = false,
     this.icon,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -90,10 +90,7 @@ class AppButton extends StatelessWidget {
     }
 
     if (isFullWidth) {
-      return SizedBox(
-        width: double.infinity,
-        child: button,
-      );
+      return SizedBox(width: double.infinity, child: button);
     }
 
     return button;
@@ -105,17 +102,12 @@ class AppButton extends StatelessWidget {
         EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
       ),
       shape: WidgetStatePropertyAll(
-        RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8.r),
-        ),
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
       ),
     );
   }
 
   TextStyle _getTextStyle(ThemeData theme) {
-    return TextStyle(
-      fontSize: 14.sp,
-      fontWeight: FontWeight.w500,
-    );
+    return TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w500);
   }
 }

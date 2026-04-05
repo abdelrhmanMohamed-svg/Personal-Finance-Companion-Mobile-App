@@ -152,7 +152,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         SizedBox(height: 8.h),
         _buildStyledInput(
           controller: _nameController,
-          hint: "John Doe",
+          hint: 'Johnathan Evergreen',
           textInputAction: TextInputAction.next,
           prefixIcon: Icons.person_outlined,
           validator: (value) {
@@ -171,7 +171,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         AppText(
-          text: "Email Address",
+          text: 'Email Address',
           variant: AppTextVariant.label,
           fontWeight: FontWeight.w700,
           color: AppColors.onSurfaceVariant,
@@ -179,7 +179,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         SizedBox(height: 8.h),
         _buildStyledInput(
           controller: _emailController,
-          hint: 'Enter your email address',
+          hint: 'vault@editorial.finance',
           keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.next,
           prefixIcon: Icons.mail_outlined,
@@ -310,7 +310,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         } else if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error: ${state.message}'),
+              content: Text(state.message),
               backgroundColor: AppColors.error,
             ),
           );
@@ -327,10 +327,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ? () {
                   if (_formKey.currentState!.validate()) {
                     context.read<AuthCubit>().signUp(
-                      _emailController.text.trim(),
-                      _passwordController.text,
-                      displayName: _nameController.text.trim(),
-                    );
+                          _emailController.text.trim(),
+                          _passwordController.text,
+                        );
                   }
                 }
               : null,
