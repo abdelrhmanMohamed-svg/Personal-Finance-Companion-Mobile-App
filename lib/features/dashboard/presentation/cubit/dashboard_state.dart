@@ -1,4 +1,5 @@
 import '../../domain/entities/dashboard_entity.dart';
+import '../../../transactions/domain/entities/transaction.dart';
 
 abstract class DashboardState {}
 
@@ -8,7 +9,9 @@ class DashboardLoading extends DashboardState {}
 
 class DashboardLoaded extends DashboardState {
   final DashboardEntity dashboard;
-  DashboardLoaded(this.dashboard);
+  final List<Transaction> recentTransactions;
+
+  DashboardLoaded(this.dashboard, {this.recentTransactions = const []});
 }
 
 class DashboardEmpty extends DashboardState {}

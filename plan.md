@@ -221,6 +221,7 @@ Add engaging and meaningful product features.
 
 #### Spec Content
 - Goal data model
+- Ability to set a goal
 - Budget rules
 - Streak calculation logic
 - UI flows

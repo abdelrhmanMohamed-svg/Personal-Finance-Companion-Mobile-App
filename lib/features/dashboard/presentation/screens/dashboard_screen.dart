@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
@@ -8,6 +9,9 @@ import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/app_text.dart';
 import '../../../auth/presentation/cubits/auth_cubit.dart';
+import '../../../goals/presentation/cubit/goals_cubit.dart';
+import '../../../goals/presentation/cubit/goals_state.dart';
+import '../../../transactions/domain/entities/transaction.dart';
 import '../../domain/entities/dashboard_entity.dart';
 import '../cubit/dashboard_cubit.dart';
 import '../cubit/dashboard_state.dart';
@@ -15,8 +19,8 @@ import '../widgets/balance_card.dart';
 import '../widgets/empty_state_widget.dart';
 import '../widgets/error_state_widget.dart';
 import '../widgets/income_expense_row.dart';
-import '../widgets/summary_card.dart';
 import '../widgets/savings_goals_widget.dart';
+import '../widgets/summary_card.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -49,66 +53,73 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: () async => context.read<DashboardCubit>().refreshDashboard(),
+    return BlocProvider(
+      create: (_) => GetIt.I<GoalsCubit>()..loadGoals(),
+      child: Builder(
+        builder: (context) => RefreshIndicator(
+          onRefresh: () async {
+            context.read<DashboardCubit>().refreshDashboard();
+            context.read<GoalsCubit>().refreshGoals();
+          },
+          child: Scaffold(
+            backgroundColor: AppColors.background,
+            body: SafeArea(
+              child: BlocBuilder<DashboardCubit, DashboardState>(
+                builder: (context, state) {
+                  if (state is DashboardLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-      child: Scaffold(
-        backgroundColor: AppColors.background,
-        body: SafeArea(
-          child: BlocBuilder<DashboardCubit, DashboardState>(
-            builder: (context, state) {
-              if (state is DashboardLoading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              if (state is DashboardEmpty) {
-                return SingleChildScrollView(
-                  padding: EdgeInsets.all(20.w),
-                  child: Column(
-                    children: [
-                      _buildHeader(context),
-                      SizedBox(height: 24.h),
-                      const EmptyStateWidget(),
-                      SizedBox(height: 24.h),
-                      _buildQuickActions(context),
-                    ],
-                  ),
-                );
-              }
-
-              if (state is DashboardError) {
-                return SingleChildScrollView(
-                  padding: EdgeInsets.all(20.w),
-                  child: Column(
-                    children: [
-                      _buildHeader(context),
-                      SizedBox(height: 24.h),
-                      ErrorStateWidget(
-                        message: state.message,
-                        onRetry: () =>
-                            context.read<DashboardCubit>().loadDashboard(),
+                  if (state is DashboardEmpty) {
+                    return SingleChildScrollView(
+                      padding: EdgeInsets.all(20.w),
+                      child: Column(
+                        children: [
+                          _buildHeader(context),
+                          SizedBox(height: 24.h),
+                          const EmptyStateWidget(),
+                          SizedBox(height: 24.h),
+                          _buildQuickActions(context),
+                        ],
                       ),
-                      SizedBox(height: 24.h),
-                      _buildQuickActions(context),
-                    ],
-                  ),
-                );
-              }
+                    );
+                  }
 
-              if (state is DashboardLoaded) {
-                return _buildLoadedContent(context, state.dashboard);
-              }
+                  if (state is DashboardError) {
+                    return SingleChildScrollView(
+                      padding: EdgeInsets.all(20.w),
+                      child: Column(
+                        children: [
+                          _buildHeader(context),
+                          SizedBox(height: 24.h),
+                          ErrorStateWidget(
+                            message: state.message,
+                            onRetry: () =>
+                                context.read<DashboardCubit>().loadDashboard(),
+                          ),
+                          SizedBox(height: 24.h),
+                          _buildQuickActions(context),
+                        ],
+                      ),
+                    );
+                  }
 
-              return const Center(child: CircularProgressIndicator());
-            },
+                  if (state is DashboardLoaded) {
+                    return _buildLoadedContent(context, state.dashboard, state.recentTransactions);
+                  }
+
+                  return const Center(child: CircularProgressIndicator());
+                },
+              ),
+            ),
+            bottomNavigationBar: _buildBottomNav(context),
           ),
         ),
-        bottomNavigationBar: _buildBottomNav(context),
       ),
     );
   }
 
-  Widget _buildLoadedContent(BuildContext context, DashboardEntity dashboard) {
+  Widget _buildLoadedContent(BuildContext context, DashboardEntity dashboard, List<Transaction> recentTransactions) {
     return SingleChildScrollView(
       padding: EdgeInsets.all(20.w),
       child: Column(
@@ -123,31 +134,47 @@ class _DashboardScreenState extends State<DashboardScreen>
             totalExpenses: dashboard.totalExpenses,
           ),
           SizedBox(height: 24.h),
-          SavingsGoalsWidget(
-            goals: const [
-              GoalData(
-                title: 'Vacation in Bali',
-                targetAmount: 4000,
-                savedAmount: 3000,
-                progress: 0.75,
-                icon: Icons.beach_access_rounded,
-              ),
-              GoalData(
-                title: 'New Car',
-                targetAmount: 25000,
-                savedAmount: 8500,
-                progress: 0.34,
-                icon: Icons.directions_car_rounded,
-              ),
-            ],
-            onTap: () => context.push('/goals'),
+          BlocBuilder<GoalsCubit, GoalsState>(
+            builder: (context, goalsState) {
+              List<GoalData> goals = [];
+              int? streak;
+
+              if (goalsState is GoalsLoaded) {
+                goals = goalsState.savingsGoals
+                    .take(2)
+                    .map(
+                      (goal) => GoalData(
+                        title: goal.name,
+                        targetAmount: goal.targetAmount,
+                        savedAmount: goal.currentSaved,
+                        progress: goal.progressPercentage.clamp(0.0, 1.0),
+                        icon: Icons.flag_rounded,
+                      ),
+                    )
+                    .toList();
+                streak = goalsState.streak?.currentStreak;
+              }
+
+              return Column(
+                children: [
+                  if (streak != null && streak > 0) ...[
+                    _buildStreakCard(streak),
+                    SizedBox(height: 16.h),
+                  ],
+                  SavingsGoalsWidget(
+                    goals: goals,
+                    onTap: () => context.push('/goals'),
+                  ),
+                ],
+              );
+            },
           ),
           SizedBox(height: 24.h),
           _buildViewInsights(context),
           SizedBox(height: 24.h),
           _buildQuickActions(context),
           SizedBox(height: 24.h),
-          _buildRecentTransactions(context),
+          _buildRecentTransactions(context, recentTransactions),
         ],
       ),
     );
@@ -231,6 +258,46 @@ class _DashboardScreenState extends State<DashboardScreen>
             Icon(Icons.chevron_right, color: AppColors.primary),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildStreakCard(int streak) {
+    return AppCard(
+      padding: EdgeInsets.all(16.w),
+      child: Row(
+        children: [
+          Container(
+            padding: EdgeInsets.all(12.w),
+            decoration: BoxDecoration(
+              color: AppColors.tertiary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            child: Icon(
+              Icons.local_fire_department_rounded,
+              color: AppColors.tertiary,
+              size: 24.w,
+            ),
+          ),
+          SizedBox(width: 16.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AppText(
+                  text: 'Saving Streak',
+                  variant: AppTextVariant.body,
+                  fontWeight: FontWeight.w600,
+                ),
+                AppText(
+                  text: '$streak day${streak != 1 ? 's' : ''} in a row!',
+                  variant: AppTextVariant.caption,
+                  color: AppColors.textSecondary,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -331,7 +398,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-  Widget _buildRecentTransactions(BuildContext context) {
+  Widget _buildRecentTransactions(BuildContext context, List<Transaction> transactions) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -350,17 +417,68 @@ class _DashboardScreenState extends State<DashboardScreen>
           ],
         ),
         SizedBox(height: 8.h),
-        AppCard(
-          padding: EdgeInsets.all(20.w),
-          child: Center(
-            child: AppText(
-              text: 'No recent transactions',
-              variant: AppTextVariant.body,
-              color: AppColors.textSecondary,
+        if (transactions.isEmpty)
+          AppCard(
+            padding: EdgeInsets.all(20.w),
+            child: Center(
+              child: AppText(
+                text: 'No recent transactions',
+                variant: AppTextVariant.body,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          )
+        else
+          ...transactions.map((tx) => _buildTransactionItem(tx)),
+      ],
+    );
+  }
+
+  Widget _buildTransactionItem(Transaction tx) {
+    final isIncome = tx.type == TransactionType.income;
+    return AppCard(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      margin: EdgeInsets.only(bottom: 8.h),
+      child: Row(
+        children: [
+          Container(
+            padding: EdgeInsets.all(10.w),
+            decoration: BoxDecoration(
+              color: (isIncome ? AppColors.income : AppColors.expense).withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            child: Icon(
+              isIncome ? Icons.arrow_downward_rounded : Icons.arrow_upward_rounded,
+              color: isIncome ? AppColors.income : AppColors.expense,
+              size: 20.w,
             ),
           ),
-        ),
-      ],
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AppText(
+                  text: tx.category,
+                  variant: AppTextVariant.body,
+                  fontWeight: FontWeight.w600,
+                ),
+                AppText(
+                  text: '${tx.date.day}/${tx.date.month}/${tx.date.year}',
+                  variant: AppTextVariant.caption,
+                  color: AppColors.textSecondary,
+                ),
+              ],
+            ),
+          ),
+          AppText(
+            text: '${isIncome ? '+' : '-'}\$${tx.amount.toStringAsFixed(2)}',
+            variant: AppTextVariant.body,
+            fontWeight: FontWeight.w600,
+            color: isIncome ? AppColors.income : AppColors.expense,
+          ),
+        ],
+      ),
     );
   }
 

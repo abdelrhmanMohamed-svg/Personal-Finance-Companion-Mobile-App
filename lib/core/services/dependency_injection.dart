@@ -9,7 +9,12 @@ import '../../features/dashboard/data/datasources/dashboard_datasource.dart';
 import '../../features/dashboard/data/repositories/dashboard_repository_impl.dart';
 import '../../features/dashboard/domain/repositories/dashboard_repository.dart';
 import '../../features/dashboard/domain/usecases/get_dashboard_summary.dart';
+import '../../features/dashboard/domain/usecases/get_recent_transactions.dart';
 import '../../features/dashboard/presentation/cubit/dashboard_cubit.dart';
+import '../../features/goals/data/datasources/goals_datasource.dart';
+import '../../features/goals/data/repositories/goals_repository_impl.dart';
+import '../../features/goals/domain/repositories/goals_repository.dart';
+import '../../features/goals/presentation/cubit/goals_cubit.dart';
 
 final getIt = GetIt.instance;
 
@@ -41,16 +46,37 @@ Future<void> setupDependencies() async {
   );
 
   getIt.registerLazySingleton<DashboardRepository>(
-    () => DashboardRepositoryImpl(getIt<DashboardDataSource>()),
+    () => DashboardRepositoryImpl(
+        getIt<DashboardDataSource>(), getIt<SupabaseClient>()),
   );
 
   getIt.registerFactory<GetDashboardSummary>(
     () => GetDashboardSummary(getIt<DashboardRepository>()),
   );
 
+  getIt.registerFactory<GetRecentTransactions>(
+    () => GetRecentTransactions(getIt<DashboardRepository>()),
+  );
+
   getIt.registerFactory<DashboardCubit>(
     () => DashboardCubit(
       getDashboardSummary: getIt<GetDashboardSummary>(),
+      getRecentTransactions: getIt<GetRecentTransactions>(),
+      supabaseClient: getIt<SupabaseClient>(),
+    ),
+  );
+
+  getIt.registerLazySingleton<GoalsDataSource>(
+    () => GoalsDataSource(getIt<SupabaseClient>()),
+  );
+
+  getIt.registerLazySingleton<GoalsRepository>(
+    () => GoalsRepositoryImpl(getIt<GoalsDataSource>()),
+  );
+
+  getIt.registerFactory<GoalsCubit>(
+    () => GoalsCubit(
+      goalsRepository: getIt<GoalsRepository>(),
       supabaseClient: getIt<SupabaseClient>(),
     ),
   );
