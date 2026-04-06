@@ -4,13 +4,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/routes/route_constants.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../shared/widgets/app_bottom_nav_bar.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/app_text.dart';
 import '../../../../shared/widgets/empty_state_widget.dart';
 import '../../../../shared/widgets/error_state_widget.dart';
-import '../../../auth/presentation/cubits/auth_cubit.dart';
+import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../../goals/presentation/cubit/goals_cubit.dart';
 import '../../../goals/presentation/cubit/goals_state.dart';
 import '../../../transactions/domain/entities/transaction.dart';
@@ -64,6 +66,9 @@ class _DashboardScreenState extends State<DashboardScreen>
             backgroundColor: AppColors.background,
             body: SafeArea(
               child: BlocBuilder<DashboardCubit, DashboardState>(
+                buildWhen: (previous, current) {
+                  return previous.runtimeType != current.runtimeType;
+                },
                 builder: (context, state) {
                   if (state is DashboardLoading) {
                     return const Center(child: CircularProgressIndicator());
@@ -81,7 +86,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                             title: 'Welcome to Your Finance Companion',
                             message: 'Start by adding your first transaction to track your finances.',
                             actionLabel: 'Add Transaction',
-                            onAction: () => context.push('/transactions/add'),
+                            onAction: () => context.push(AppRoutes.transactionAdd),
                           ),
                           SizedBox(height: 24.h),
                           _buildQuickActions(context),
@@ -119,7 +124,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 },
               ),
             ),
-            bottomNavigationBar: _buildBottomNav(context),
+            bottomNavigationBar: const AppBottomNavBar(currentIndex: 0),
           ),
         ),
       ),
@@ -142,6 +147,9 @@ class _DashboardScreenState extends State<DashboardScreen>
           ),
           SizedBox(height: 24.h),
           BlocBuilder<GoalsCubit, GoalsState>(
+            buildWhen: (previous, current) {
+              return previous.runtimeType != current.runtimeType;
+            },
             builder: (context, goalsState) {
               List<GoalData> goals = [];
               int? streak;
@@ -170,7 +178,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   ],
                   SavingsGoalsWidget(
                     goals: goals,
-                    onTap: () => context.push('/goals'),
+                    onTap: () => context.push(AppRoutes.goals),
                   ),
                 ],
               );
@@ -190,7 +198,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   Widget _buildViewInsights(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.push('/insights'),
+      onTap: () => context.push(AppRoutes.insights),
       child: Container(
         padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
@@ -334,7 +342,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               child: AppButton(
                 text: 'Add',
                 icon: Icons.add_rounded,
-                onPressed: () => context.push('/transactions/add'),
+                onPressed: () => context.push(AppRoutes.transactionAdd),
                 isFullWidth: true,
               ),
             ),
@@ -344,7 +352,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 text: 'Set Goal',
                 icon: Icons.flag_rounded,
                 variant: AppButtonVariant.outlined,
-                onPressed: () => context.push('/goals'),
+                onPressed: () => context.push(AppRoutes.goals),
                 isFullWidth: true,
               ),
             ),
@@ -363,7 +371,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           children: [
             AppText(text: 'Recent Transactions', variant: AppTextVariant.title),
             TextButton(
-              onPressed: () => context.push('/transactions'),
+              onPressed: () => context.push(AppRoutes.transactions),
               child: AppText(
                 text: 'See All',
                 variant: AppTextVariant.label,
@@ -434,61 +442,6 @@ class _DashboardScreenState extends State<DashboardScreen>
             color: isIncome ? AppColors.income : AppColors.expense,
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildBottomNav(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest.withValues(alpha: 0.85),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
-        child: BottomNavigationBar(
-          currentIndex: 0,
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.transparent,
-          selectedItemColor: AppColors.primary,
-          unselectedItemColor: AppColors.textSecondary,
-          selectedFontSize: 12.sp,
-          unselectedFontSize: 12.sp,
-          elevation: 0,
-          onTap: (index) {
-            switch (index) {
-              case 0:
-                break;
-              case 1:
-                context.push('/transactions');
-                break;
-              case 2:
-                context.push('/goals');
-                break;
-              case 3:
-                context.push('/insights');
-                break;
-            }
-          },
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard_rounded),
-              label: 'Dashboard',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.receipt_long_rounded),
-              label: 'Transactions',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.flag_rounded),
-              label: 'Goals',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.insights_rounded),
-              label: 'Insights',
-            ),
-          ],
-        ),
       ),
     );
   }

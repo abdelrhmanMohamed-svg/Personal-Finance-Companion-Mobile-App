@@ -4,13 +4,16 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/routes/route_constants.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../shared/widgets/app_bottom_nav_bar.dart';
 import '../../../../shared/widgets/app_card.dart';
+import '../../../../shared/widgets/app_custom_app_bar.dart';
 import '../../../../shared/widgets/app_text.dart';
 import '../../../../shared/widgets/empty_state_widget.dart';
 import '../../domain/entities/transaction.dart';
-import '../cubits/transactions_cubit.dart';
-import '../cubits/transactions_state.dart';
+import '../cubit/transactions_cubit.dart';
+import '../cubit/transactions_state.dart';
 import '../widgets/transaction_filter_sheet.dart';
 
 class TransactionsListScreen extends StatefulWidget {
@@ -44,12 +47,16 @@ class _TransactionsListScreenState extends State<TransactionsListScreen>
     final cubit = context.read<TransactionsCubit>();
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        leading: SizedBox.shrink(),
-        backgroundColor: AppColors.surface,
-        title: AppText(text: 'Transactions', variant: AppTextVariant.title),
+      appBar: AppCustomAppBar(
+        title: 'Transactions',
         actions: [
           BlocBuilder<TransactionsCubit, TransactionsState>(
+            buildWhen: (previous, current) {
+              if (previous is TransactionsLoaded && current is TransactionsLoaded) {
+                return previous.activeFilter != current.activeFilter;
+              }
+              return previous.runtimeType != current.runtimeType;
+            },
             builder: (context, state) {
               final hasFilter =
                   state is TransactionsLoaded &&
@@ -108,6 +115,9 @@ class _TransactionsListScreenState extends State<TransactionsListScreen>
           ),
           Expanded(
             child: BlocBuilder<TransactionsCubit, TransactionsState>(
+              buildWhen: (previous, current) {
+                return previous != current;
+              },
               builder: (context, state) {
                 if (state is TransactionsLoading) {
                   return const Center(child: CircularProgressIndicator());
@@ -183,15 +193,16 @@ class _TransactionsListScreenState extends State<TransactionsListScreen>
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context
-            .push('/transactions/add')
-            .then(
-              (value) => context.read<TransactionsCubit>().loadTransactions(),
-            ),
+        onPressed: () {
+          final cubit = context.read<TransactionsCubit>();
+          context.push(AppRoutes.transactionAdd).then(
+            (value) => cubit.loadTransactions(),
+          );
+        },
         backgroundColor: AppColors.primary,
         child: Icon(Icons.add_rounded, color: AppColors.onPrimary),
       ),
-      bottomNavigationBar: _buildBottomNav(context),
+      bottomNavigationBar: const AppBottomNavBar(currentIndex: 1),
     );
   }
 
@@ -252,7 +263,7 @@ class _TransactionsListScreenState extends State<TransactionsListScreen>
       title: 'No Transactions Yet',
       message: 'Start tracking your finances by adding your first transaction.',
       actionLabel: 'Add Transaction',
-      onAction: () => context.push('/transactions/add'),
+      onAction: () => context.push(AppRoutes.transactionAdd),
     );
   }
 
@@ -279,7 +290,7 @@ class _TransactionsListScreenState extends State<TransactionsListScreen>
           padding: EdgeInsets.only(bottom: 12.h),
           child: AppCard(
             padding: EdgeInsets.all(16.w),
-            onTap: () => context.push('/transactions/add', extra: transaction),
+            onTap: () => context.push(AppRoutes.transactionAdd, extra: transaction),
             child: Row(
               children: [
                 Container(
@@ -351,58 +362,5 @@ class _TransactionsListScreenState extends State<TransactionsListScreen>
     } else {
       return DateFormat('MMM dd, yyyy').format(date);
     }
-  }
-
-  Widget _buildBottomNav(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest.withValues(alpha: 0.85),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
-        child: BottomNavigationBar(
-          currentIndex: 1,
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.transparent,
-          selectedItemColor: AppColors.primary,
-          unselectedItemColor: AppColors.textSecondary,
-          elevation: 0,
-          onTap: (index) {
-            switch (index) {
-              case 0:
-                context.go('/dashboard');
-                break;
-              case 1:
-                break;
-              case 2:
-                context.push('/goals');
-                break;
-              case 3:
-                context.push('/insights');
-                break;
-            }
-          },
-          items: [
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.dashboard_rounded),
-              label: 'Dashboard',
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.receipt_long_rounded),
-              label: 'Transactions',
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.flag_rounded),
-              label: 'Goals',
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.insights_rounded),
-              label: 'Insights',
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

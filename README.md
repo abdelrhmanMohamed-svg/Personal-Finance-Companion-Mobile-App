@@ -122,3 +122,20 @@ Each feature follows:
 - Placeholder screens will be replaced with UI from Google Stitch
 - Supabase credentials should be in .env file (not committed)
 - Run `flutter pub get` after any pubspec.yaml changes
+
+## Code Quality
+
+This project follows code quality standards defined in the `docs/` directory.
+
+| Document | Description |
+|----------|--------------|
+| [docs/code-review-checklist.md](docs/code-review-checklist.md) | Mandatory checklist for all PRs |
+| [docs/naming-conventions.md](docs/naming-conventions.md) | Naming standards |
+| [docs/performance-baselines.md](docs/performance-baselines.md) | Performance targets |
+| [docs/shared-component-process.md](docs/shared-component-process.md) | Reusable component process |
+
+### Before Submitting a PR
+
+1. Complete self-review using the code review checklist
+2. Verify all naming conventions are followed
+3. Ensure performance targets are still met

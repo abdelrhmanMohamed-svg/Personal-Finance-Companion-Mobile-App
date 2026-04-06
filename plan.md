@@ -269,7 +269,29 @@ Improve the overall mobile experience.
 
 ---
 
-### Phase 9: Documentation and Final Review
+### Phase 9: Code Review & Optimization (Per Feature)
+
+Objective
+Review and improve code quality feature by feature, ensuring best practices, reusability, and high performance.
+
+Deliverables
+
+Reviewed and optimized code لكل feature
+Refactored components (reusable widgets/services)
+Reduced boilerplate code
+Improved performance
+Consistent architecture across features
+
+Spec Content
+
+Code review rules (clean architecture, separation of concerns)
+Reusability improvements (shared widgets/services)
+Performance optimizations
+Naming conventions
+Folder structure consistency
+Best practices for Flutter + Cubit
+
+### Phase 10: Documentation and Final Review
 
 #### Objective
 Prepare the project for evaluation.

@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get_it/get_it.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../shared/widgets/app_bottom_nav_bar.dart';
 import '../../../../shared/widgets/app_card.dart';
+import '../../../../shared/widgets/app_custom_app_bar.dart';
 import '../../../../shared/widgets/app_text.dart';
 import '../../../../shared/widgets/empty_state_widget.dart';
 import '../cubit/goals_cubit.dart';
@@ -30,13 +31,8 @@ class _GoalsScreenContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        leading: SizedBox.shrink(),
-        backgroundColor: AppColors.surface,
-        title: const AppText(
-          text: 'Savings Goals',
-          variant: AppTextVariant.title,
-        ),
+      appBar: AppCustomAppBar(
+        title: 'Savings Goals',
         actions: [
           IconButton(
             icon: const Icon(Icons.add_rounded),
@@ -45,10 +41,14 @@ class _GoalsScreenContent extends StatelessWidget {
         ],
       ),
       body: BlocConsumer<GoalsCubit, GoalsState>(
+        listenWhen: (previous, current) => current is GoalCompleted,
         listener: (context, state) {
           if (state is GoalCompleted) {
             _showGoalCompletedDialog(context, state.goalName);
           }
+        },
+        buildWhen: (previous, current) {
+          return previous.runtimeType != current.runtimeType;
         },
         builder: (context, state) {
           if (state is GoalsLoading) {
@@ -89,7 +89,7 @@ class _GoalsScreenContent extends StatelessWidget {
           return const SizedBox.shrink();
         },
       ),
-      bottomNavigationBar: _buildBottomNav(context),
+      bottomNavigationBar: const AppBottomNavBar(currentIndex: 2),
     );
   }
 
@@ -585,59 +585,6 @@ class _GoalsScreenContent extends StatelessWidget {
             child: const Text('Awesome!'),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildBottomNav(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest.withValues(alpha: 0.85),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
-        child: BottomNavigationBar(
-          currentIndex: 2,
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.transparent,
-          selectedItemColor: AppColors.primary,
-          unselectedItemColor: AppColors.textSecondary,
-          elevation: 0,
-          onTap: (index) {
-            switch (index) {
-              case 0:
-                context.go('/dashboard');
-                break;
-              case 1:
-                context.push('/transactions');
-                break;
-              case 2:
-                break;
-              case 3:
-                context.push('/insights');
-                break;
-            }
-          },
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard_rounded),
-              label: 'Dashboard',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.receipt_long_rounded),
-              label: 'Transactions',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.flag_rounded),
-              label: 'Goals',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.insights_rounded),
-              label: 'Insights',
-            ),
-          ],
-        ),
       ),
     );
   }

@@ -4,7 +4,7 @@ import '../config/environment.dart';
 import 'supabase_service.dart';
 import '../../features/transactions/data/repositories/transaction_repository_impl.dart';
 import '../../features/transactions/domain/repositories/transaction_repository.dart';
-import '../../features/transactions/presentation/cubits/transactions_cubit.dart';
+import '../../features/transactions/presentation/cubit/transactions_cubit.dart';
 import '../../features/dashboard/data/datasources/dashboard_datasource.dart';
 import '../../features/dashboard/data/repositories/dashboard_repository_impl.dart';
 import '../../features/dashboard/domain/repositories/dashboard_repository.dart';

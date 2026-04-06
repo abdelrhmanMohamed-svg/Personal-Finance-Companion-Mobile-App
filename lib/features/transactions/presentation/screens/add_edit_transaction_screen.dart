@@ -7,8 +7,8 @@ import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_input.dart';
 import '../../../../shared/widgets/app_text.dart';
 import '../../domain/entities/transaction.dart';
-import '../cubits/transactions_cubit.dart';
-import '../cubits/transactions_state.dart';
+import '../cubit/transactions_cubit.dart';
+import '../cubit/transactions_state.dart';
 
 class AddEditTransactionScreen extends StatefulWidget {
   final Transaction? transaction;
@@ -307,6 +307,7 @@ class _AddEditTransactionScreenState extends State<AddEditTransactionScreen> {
         SizedBox(height: 8.h),
         GestureDetector(
           onTap: () async {
+            final cubit = context.read<TransactionsCubit>();
             final date = await showDatePicker(
               context: context,
               initialDate: currentDate,
@@ -314,7 +315,7 @@ class _AddEditTransactionScreenState extends State<AddEditTransactionScreen> {
               lastDate: DateTime.now(),
             );
             if (date != null) {
-              context.read<TransactionsCubit>().setDate(date);
+              cubit.setDate(date);
             }
           },
           child: Container(

@@ -4,7 +4,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text.dart';
 import '../../domain/entities/transaction.dart';
-import '../cubits/transactions_state.dart';
+import '../cubit/transactions_state.dart';
 
 class TransactionFilterSheet extends StatefulWidget {
   final TransactionFilter? currentFilter;

@@ -3,8 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/routes/route_constants.dart';
 import '../../../../core/services/dependency_injection.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../shared/widgets/app_bottom_nav_bar.dart';
+import '../../../../shared/widgets/app_custom_app_bar.dart';
 import '../../../../shared/widgets/empty_state_widget.dart';
 import '../../../../shared/widgets/error_state_widget.dart';
 import '../cubit/insights_cubit.dart';
@@ -26,13 +28,11 @@ class InsightsScreen extends StatelessWidget {
       child: Builder(
         builder: (ctx) {
           return Scaffold(
-            appBar: AppBar(
-              leading: SizedBox.shrink(),
-              title: const Text('Insights'),
-              backgroundColor: AppColors.surface,
-              elevation: 0,
-            ),
+            appBar: AppCustomAppBar(title: 'Insights'),
             body: BlocBuilder<InsightsCubit, InsightsState>(
+              buildWhen: (previous, current) {
+                return previous.runtimeType != current.runtimeType;
+              },
               builder: (context, state) {
                 if (state is InsightsLoading) {
                   return const Center(child: CircularProgressIndicator());
@@ -44,7 +44,7 @@ class InsightsScreen extends StatelessWidget {
                     title: 'No Insights Yet',
                     message: 'Add some transactions to see your spending insights.',
                     actionLabel: 'Add Transaction',
-                    onAction: () => context.push('/transactions/add'),
+                    onAction: () => context.push(AppRoutes.transactionAdd),
                   );
                 }
 
@@ -130,7 +130,7 @@ class InsightsScreen extends StatelessWidget {
                 return const SizedBox.shrink();
               },
             ),
-            bottomNavigationBar: _buildBottomNav(ctx),
+            bottomNavigationBar: const AppBottomNavBar(currentIndex: 3),
           );
         },
       ),
@@ -144,59 +144,6 @@ class InsightsScreen extends StatelessWidget {
         fontSize: 18.sp,
         fontWeight: FontWeight.bold,
         color: Colors.grey.shade800,
-      ),
-    );
-  }
-
-  Widget _buildBottomNav(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest.withValues(alpha: 0.85),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
-        child: BottomNavigationBar(
-          currentIndex: 3,
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.transparent,
-          selectedItemColor: AppColors.primary,
-          unselectedItemColor: AppColors.textSecondary,
-          elevation: 0,
-          onTap: (index) {
-            switch (index) {
-              case 0:
-                context.go('/dashboard');
-                break;
-              case 1:
-                context.push('/transactions');
-                break;
-              case 2:
-                context.push('/goals');
-                break;
-              case 3:
-                break;
-            }
-          },
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard_rounded),
-              label: 'Dashboard',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.receipt_long_rounded),
-              label: 'Transactions',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.flag_rounded),
-              label: 'Goals',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.insights_rounded),
-              label: 'Insights',
-            ),
-          ],
-        ),
       ),
     );
   }

@@ -42,7 +42,7 @@ class TransactionListItem extends StatelessWidget {
         child: ListTile(
           onTap: onTap,
           leading: CircleAvatar(
-            backgroundColor: amountColor.withOpacity(0.2),
+            backgroundColor: amountColor.withValues(alpha: 0.2),
             child: Icon(
               isIncome ? Icons.arrow_downward : Icons.arrow_upward,
               color: amountColor,

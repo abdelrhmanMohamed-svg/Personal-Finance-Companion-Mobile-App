@@ -24,8 +24,8 @@ class DashboardCubit extends Cubit<DashboardState> {
     _fetchData();
   }
 
-  void refreshDashboard() {
-    _fetchData();
+  Future<void> refreshDashboard() async {
+    await _fetchData();
   }
 
   Future<void> _fetchData() async {

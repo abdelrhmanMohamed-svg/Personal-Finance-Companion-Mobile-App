@@ -3,12 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/routes/route_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text.dart';
-import '../cubits/auth_cubit.dart';
-import '../cubits/auth_state.dart';
+import '../cubit/auth_cubit.dart';
+import '../cubit/auth_state.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -221,7 +222,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Align(
       alignment: Alignment.centerRight,
       child: GestureDetector(
-        onTap: () => context.push('/forgot-password'),
+        onTap: () => context.push(AppRoutes.forgotPassword),
         child: AppText(
           text: 'Forgot Password?',
           variant: AppTextVariant.label,
@@ -304,7 +305,7 @@ class _LoginScreenState extends State<LoginScreen> {
           color: AppColors.onSurfaceVariant,
         ),
         GestureDetector(
-          onTap: () => context.push('/register'),
+          onTap: () => context.push(AppRoutes.register),
           child: AppText(
             text: 'Sign Up',
             variant: AppTextVariant.body,
