@@ -1,5 +1,21 @@
 # Personal Finance Companion - Architecture Documentation
 
+## About This Project
+
+This project was built using modern AI-assisted development methodologies:
+
+- **OpenCode with SpecKit**: Used for feature specification, planning, and task management. SpecKit provided structured workflows for requirement analysis, implementation planning, and progress tracking throughout the development lifecycle.
+
+- **Google Stitch MCP**: Employed for UI/UX design generation, creating a consistent and professional design system with reusable components tailored for mobile platforms.
+
+- **LLM Models**:
+  - **MiniMax M2.5**: Primary model used for code generation, problem-solving, and implementation guidance
+  - **ChatGPT**: Assisted with initial project planning and architecture design
+
+This approach enabled efficient development with clear documentation, structured planning, and consistent quality across all features.
+
+---
+
 ## Project Structure
 
 This project follows a **Feature-based + Clean Architecture** pattern.
@@ -117,11 +133,125 @@ Each feature follows:
 - Widget tests: `test/widget/`
 - Integration tests: `test/integration/`
 
-## Notes
+## Prerequisites
 
-- Placeholder screens will be replaced with UI from Google Stitch
-- Supabase credentials should be in .env file (not committed)
-- Run `flutter pub get` after any pubspec.yaml changes
+Before running the app, ensure you have:
+
+- **Flutter SDK 3.x+**: [Install Flutter](https://flutter.dev/docs/get-started/install)
+- **Dart 3.x+**: Comes with Flutter
+- **Supabase Account**: Create a free project at [supabase.com](https://supabase.com)
+- **Code Editor**: VS Code or Android Studio recommended
+
+---
+
+## Installation
+
+1. **Clone the repository**:
+   ```bash
+   git clone <repository-url>
+   cd personal_finance_companion_mobile_app
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   flutter pub get
+   ```
+
+3. **Configure Supabase**:
+   - Create a project at [supabase.com](https://supabase.com)
+   - Get your project URL and anon key from Settings → API
+   - Create a `.env` file in the project root:
+     ```
+     SUPABASE_URL=your_project_url
+     SUPABASE_ANON_KEY=your_anon_key
+     ```
+   - Copy `.env.example` to `.env` if available
+
+4. **Set up Database**:
+   The project includes a complete database migration file. To set up your database:
+
+   **Option A: Using Supabase Dashboard**
+   1. Go to your Supabase project dashboard
+   2. Navigate to the SQL Editor
+   3. Copy and run the contents of `migrations/00_complete_setup.sql`
+
+   **Option B: Using Supabase CLI**
+   ```bash
+   # Install Supabase CLI if not already installed
+   npm install -g supabase
+
+   # Link to your Supabase project
+   supabase link --project-ref your_project_ref
+
+   # Push migrations
+   supabase db push
+   ```
+
+   **Tables Created**:
+   | Table | Purpose |
+   |-------|---------|
+   | `user_profiles` | Extended user information |
+   | `transactions` | User transaction records (income/expense) |
+   | `budgets` | Monthly budget limits per category |
+   | `savings_goals` | Savings target tracking |
+   | `streaks` | Daily saving streak tracking |
+
+   **Security**: All tables have Row Level Security (RLS) enabled with policies ensuring users can only access their own data.
+
+---
+
+## Running the App
+
+### Development Mode
+
+```bash
+# Run on connected device or emulator
+flutter run
+
+# Run on specific platform
+flutter run -d android    # Android
+flutter run -d ios       # iOS (requires macOS)
+flutter run -d chrome    # Web
+```
+
+### Build Commands
+
+```bash
+# Debug build
+flutter build apk --debug    # Android APK
+flutter build ios --debug     # iOS (requires macOS)
+
+# Release build
+flutter build apk            # Android APK
+flutter build ios            # iOS (requires macOS)
+```
+
+---
+
+## Assumptions
+
+- Users have basic knowledge of Flutter and Dart development
+- Developers have access to a Supabase account for backend setup
+- The target audience includes both technical developers and non-technical users
+- Documentation will be maintained alongside code changes in future development
+
+## Known Limitations
+
+This section documents current limitations and planned improvements:
+
+- **No offline mode**: App requires internet connection to sync with Supabase
+- **Limited to English**: UI currently supports English only
+- **No multi-currency support**: All amounts displayed in single currency
+- **No recurring transactions**: Manual entry required for recurring items
+- **No export feature**: Data cannot be exported to CSV/PDF yet
+
+### Workarounds
+
+- For offline access, consider future implementation of local storage with sync
+- Currency conversion can be added in future releases
+- Recurring transactions can be manually added each period
+
+---
 
 ## Code Quality
 
@@ -139,3 +269,29 @@ This project follows code quality standards defined in the `docs/` directory.
 1. Complete self-review using the code review checklist
 2. Verify all naming conventions are followed
 3. Ensure performance targets are still met
+
+---
+
+## Contributing
+
+Contributions are welcome! To contribute to this project:
+
+1. **Fork** the repository
+2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
+3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
+4. **Push** to the branch (`git push origin feature/amazing-feature`)
+5. **Open** a Pull Request
+
+### Contribution Guidelines
+
+- Follow the existing code style and naming conventions
+- Add tests for new features when applicable
+- Update documentation for any changes
+- Ensure all tests pass before submitting PR
+- Reference the related issue in your PR description
+
+---
+
+## License
+
+This project is for educational/assessment purposes.
