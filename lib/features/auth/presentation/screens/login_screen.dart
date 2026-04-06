@@ -73,6 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         SizedBox(height: 8.h),
         AppText(
+          textAlign: TextAlign.center,
           text: 'Sign in to continue managing your finances',
           variant: AppTextVariant.body,
           color: AppColors.onSurfaceVariant,

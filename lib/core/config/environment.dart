@@ -1,3 +1,5 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 enum AppEnvironment { dev, staging, prod }
 
 class Environment {
@@ -7,7 +9,7 @@ class Environment {
   final bool supabaseDebug;
   final bool isProduction;
 
-  const Environment({
+  Environment({
     required this.environment,
     required this.supabaseUrl,
     required this.supabaseAnonKey,
@@ -15,27 +17,23 @@ class Environment {
     this.isProduction = false,
   });
 
-  static Environment get development => const Environment(
-    environment: AppEnvironment.dev,
-    supabaseUrl: 'https://vzqaguiustzukunpdvpv.supabase.co',
-    supabaseAnonKey: 'sb_publishable_wvrVRawtUGRu6NYDYndQpQ_kAVlDT_i',
-    supabaseDebug: true,
-    isProduction: false,
-  );
+  static Future<Environment> load() async {
+    final supabaseUrl = dotenv.env['SUPABASE_URL'];
+    final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'];
 
-  static Environment get staging => const Environment(
-    environment: AppEnvironment.staging,
-    supabaseUrl: '',
-    supabaseAnonKey: '',
-    supabaseDebug: true,
-    isProduction: false,
-  );
+    if (supabaseUrl == null || supabaseUrl.isEmpty) {
+      throw Exception('SUPABASE_URL is not configured in .env file');
+    }
+    if (supabaseAnonKey == null || supabaseAnonKey.isEmpty) {
+      throw Exception('SUPABASE_ANON_KEY is not configured in .env file');
+    }
 
-  static Environment get production => const Environment(
-    environment: AppEnvironment.prod,
-    supabaseUrl: '',
-    supabaseAnonKey: '',
-    supabaseDebug: false,
-    isProduction: true,
-  );
+    return Environment(
+      environment: AppEnvironment.dev,
+      supabaseUrl: supabaseUrl,
+      supabaseAnonKey: supabaseAnonKey,
+      supabaseDebug: true,
+      isProduction: false,
+    );
+  }
 }

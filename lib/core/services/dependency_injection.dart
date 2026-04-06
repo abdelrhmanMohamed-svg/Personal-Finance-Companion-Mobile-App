@@ -23,7 +23,7 @@ import '../../features/insights/presentation/cubit/insights_cubit.dart';
 final getIt = GetIt.instance;
 
 Future<void> setupDependencies() async {
-  final env = Environment.development;
+  final env = await Environment.load();
 
   await Supabase.initialize(
     url: env.supabaseUrl,
