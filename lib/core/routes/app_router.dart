@@ -8,6 +8,7 @@ import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
 import '../../features/goals/presentation/screens/goals_screen.dart';
 import '../../features/insights/presentation/screens/insights_screen.dart';
+import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../../features/transactions/domain/entities/transaction.dart';
 import '../../features/transactions/presentation/screens/add_edit_transaction_screen.dart';
 import '../../features/transactions/presentation/screens/transactions_list_screen.dart';
@@ -57,6 +58,10 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.insights,
         builder: (context, state) => const InsightsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.settings,
+        builder: (context, state) => const SettingsScreen(),
       ),
     ],
   );

@@ -47,4 +47,59 @@ class AppColors {
   static const Color incomeBg = Color(0xFF6BFE9C);
   static const Color expense = Color(0xFFb31b25);
   static const Color expenseIcon = Color(0xFFB31B25);
+
+  static const Color incomeDark = Color(0xFF4caf50);
+  static const Color incomeIconDark = Color(0xFF087f23);
+  static const Color incomeBgDark = Color(0xFF80e27e);
+  static const Color expenseDark = Color(0xFFf44336);
+  static const Color expenseIconDark = Color(0xFFf44336);
+}
+
+class AppColorsDark {
+  static const Color primary = Color(0xFF4caf50);
+  static const Color primaryLight = Color(0xFF80e27e);
+  static const Color primaryDark = Color(0xFF087f23);
+
+  static const Color secondary = Color(0xFF4db6ac);
+  static const Color secondaryLight = Color(0xFF82e9de);
+  static const Color secondaryDark = Color(0xFF00867d);
+
+  static const Color tertiary = Color(0xFF4dd0e1);
+  static const Color tertiaryLight = Color(0xFF8affff);
+
+  static const Color success = Color(0xFF4caf50);
+  static const Color warning = Color(0xFFff9800);
+  static const Color error = Color(0xFFf44336);
+  static const Color info = Color(0xFF2196f3);
+
+  static const Color background = Color(0xFF121212);
+  static const Color surface = Color(0xFF1e1e1e);
+  static const Color surfaceContainer = Color(0xFF2c2c2c);
+  static const Color surfaceContainerHigh = Color(0xFF383838);
+  static const Color surfaceContainerHighHighest = Color(0xFF424242);
+  static const Color surfaceContainerLow = Color(0xFF1f1f1f);
+  static const Color surfaceContainerLowest = Color(0xFF1a1a1a);
+  static const Color surfaceDim = Color(0xFF141414);
+
+  static const Color textPrimary = Color(0xFFe0e0e0);
+  static const Color textSecondary = Color(0xFFb0b0b0);
+
+  static const Color divider = Color(0xFF424242);
+  static const Color disabled = Color(0xFF616161);
+  static const Color outline = Color(0xFF757575);
+  static const Color outlineVariant = Color(0xFF424242);
+
+  static const Color onPrimary = Color(0xFF003300);
+  static const Color onSecondary = Color(0xFF003333);
+  static const Color onSurface = Color(0xFFe0e0e0);
+  static const Color onSurfaceVariant = Color(0xFFb0b0b0);
+
+  static const Color primaryContainer = Color(0xFF087f23);
+  static const Color onPrimaryContainer = Color(0xFF80e27e);
+
+  static const Color income = Color(0xFF4caf50);
+  static const Color incomeIcon = Color(0xFF087f23);
+  static const Color incomeBg = Color(0xFF80e27e);
+  static const Color expense = Color(0xFFf44336);
+  static const Color expenseIcon = Color(0xFFf44336);
 }

@@ -15,6 +15,12 @@ class SavingsGoalsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
+    final textSecondary = brightness == Brightness.dark ? AppColorsDark.textSecondary : AppColors.textSecondary;
+    final primary = brightness == Brightness.dark ? AppColorsDark.primary : AppColors.primary;
+    final surfaceContainerLowest = brightness == Brightness.dark ? AppColorsDark.surfaceContainerLowest : AppColors.surfaceContainerLowest;
+    final surfaceContainer = brightness == Brightness.dark ? AppColorsDark.surfaceContainer : AppColors.surfaceContainer;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -24,7 +30,7 @@ class SavingsGoalsWidget extends StatelessWidget {
             AppText(
               text: 'SAVINGS GOALS',
               variant: AppTextVariant.caption,
-              color: AppColors.textSecondary,
+              color: textSecondary,
               fontWeight: FontWeight.w600,
               letterSpacing: 1.5,
             ),
@@ -34,58 +40,58 @@ class SavingsGoalsWidget extends StatelessWidget {
                 child: AppText(
                   text: 'See All',
                   variant: AppTextVariant.label,
-                  color: AppColors.primary,
+                  color: primary,
                 ),
               ),
           ],
         ),
         SizedBox(height: 12.h),
         if (goals.isEmpty)
-          _buildEmptyState()
+          _buildEmptyState(textSecondary, primary, surfaceContainerLowest)
         else
-          ...goals.map((goal) => _buildGoalCard(goal)),
+          ...goals.map((goal) => _buildGoalCard(goal, primary, textSecondary, surfaceContainer, surfaceContainerLowest)),
       ],
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(Color textSecondary, Color primary, Color surfaceContainerLowest) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest,
+        color: surfaceContainerLowest,
         borderRadius: BorderRadius.circular(24.r),
       ),
       child: Column(
         children: [
           Icon(
             Icons.flag_rounded,
-            color: AppColors.primary.withValues(alpha: 0.5),
+            color: primary.withValues(alpha: 0.5),
             size: 40.w,
           ),
           SizedBox(height: 12.h),
           AppText(
             text: 'No savings goals yet',
             variant: AppTextVariant.body,
-            color: AppColors.textSecondary,
+            color: textSecondary,
           ),
           SizedBox(height: 4.h),
           AppText(
             text: 'Set a goal to start saving',
             variant: AppTextVariant.caption,
-            color: AppColors.textSecondary,
+            color: textSecondary,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildGoalCard(GoalData goal) {
+  Widget _buildGoalCard(GoalData goal, Color primary, Color textSecondary, Color surfaceContainer, Color surfaceContainerLowest) {
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest,
+        color: surfaceContainerLowest,
         borderRadius: BorderRadius.circular(24.r),
       ),
       child: Column(
@@ -96,10 +102,10 @@ class SavingsGoalsWidget extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(10.w),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
+                  color: primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12.r),
                 ),
-                child: Icon(goal.icon, color: AppColors.primary, size: 20.w),
+                child: Icon(goal.icon, color: primary, size: 20.w),
               ),
               SizedBox(width: 12.w),
               Expanded(
@@ -115,7 +121,7 @@ class SavingsGoalsWidget extends StatelessWidget {
                     AppText(
                       text: '\$${goal.savedAmount.toStringAsFixed(0)} of \$${goal.targetAmount.toStringAsFixed(0)}',
                       variant: AppTextVariant.caption,
-                      color: AppColors.textSecondary,
+                      color: textSecondary,
                     ),
                   ],
                 ),
@@ -124,14 +130,14 @@ class SavingsGoalsWidget extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
                 decoration: BoxDecoration(
                   color: goal.progress >= 1.0
-                      ? AppColors.primary.withValues(alpha: 0.1)
-                      : AppColors.surfaceContainer,
+                      ? primary.withValues(alpha: 0.1)
+                      : surfaceContainer,
                   borderRadius: BorderRadius.circular(20.r),
                 ),
                 child: AppText(
                   text: '${(goal.progress * 100).toInt()}%',
                   variant: AppTextVariant.caption,
-                  color: goal.progress >= 1.0 ? AppColors.primary : AppColors.textSecondary,
+                  color: goal.progress >= 1.0 ? primary : textSecondary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -143,10 +149,8 @@ class SavingsGoalsWidget extends StatelessWidget {
             child: LinearProgressIndicator(
               value: goal.progress.clamp(0.0, 1.0),
               minHeight: 8.h,
-              backgroundColor: AppColors.surfaceContainer,
-              valueColor: AlwaysStoppedAnimation<Color>(
-                goal.progress >= 1.0 ? AppColors.primary : AppColors.primary,
-              ),
+              backgroundColor: surfaceContainer,
+              valueColor: AlwaysStoppedAnimation<Color>(primary),
             ),
           ),
         ],

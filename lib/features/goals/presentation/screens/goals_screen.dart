@@ -17,79 +17,74 @@ class GoalsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
+    final background = brightness == Brightness.dark ? AppColorsDark.background : AppColors.background;
     return BlocProvider(
       create: (_) => GetIt.I<GoalsCubit>()..loadGoals(),
-      child: const _GoalsScreenContent(),
-    );
-  }
-}
-
-class _GoalsScreenContent extends StatelessWidget {
-  const _GoalsScreenContent();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppCustomAppBar(
-        title: 'Savings Goals',
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add_rounded),
-            onPressed: () => _showAddGoalDialog(context),
-          ),
-        ],
-      ),
-      body: BlocConsumer<GoalsCubit, GoalsState>(
-        listenWhen: (previous, current) => current is GoalCompleted,
-        listener: (context, state) {
-          if (state is GoalCompleted) {
-            _showGoalCompletedDialog(context, state.goalName);
-          }
-        },
-        buildWhen: (previous, current) {
-          return previous.runtimeType != current.runtimeType;
-        },
-        builder: (context, state) {
-          if (state is GoalsLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (state is GoalsError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AppText(text: state.message, variant: AppTextVariant.body),
-                  SizedBox(height: 16.h),
-                  ElevatedButton(
-                    onPressed: () => context.read<GoalsCubit>().loadGoals(),
-                    child: const Text('Retry'),
-                  ),
-                ],
+      child: Builder(
+        builder: (context) => Scaffold(
+          backgroundColor: background,
+          appBar: AppCustomAppBar(
+            title: 'Savings Goals',
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.add_rounded),
+                onPressed: () => _showAddGoalDialog(context),
               ),
-            );
-          }
+            ],
+          ),
+          body: BlocConsumer<GoalsCubit, GoalsState>(
+            listenWhen: (previous, current) => current is GoalCompleted,
+            listener: (context, state) {
+              if (state is GoalCompleted) {
+                _showGoalCompletedDialog(context, state.goalName);
+              }
+            },
+            buildWhen: (previous, current) {
+              return previous.runtimeType != current.runtimeType;
+            },
+            builder: (context, state) {
+              if (state is GoalsLoading) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-          if (state is GoalsEmpty || state is GoalsInitial) {
-            return _buildEmptyState(context);
-          }
+              if (state is GoalsError) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      AppText(text: state.message, variant: AppTextVariant.body),
+                      SizedBox(height: 16.h),
+                      ElevatedButton(
+                        onPressed: () => context.read<GoalsCubit>().loadGoals(),
+                        child: const Text('Retry'),
+                      ),
+                    ],
+                  ),
+                );
+              }
 
-          if (state is GoalsLoaded) {
-            return _buildContent(context, state);
-          }
-          
-          if (state is GoalCompleted) {
-            return _buildContent(context, GoalsLoaded(
-              budgets: const [],
-              savingsGoals: state.goals,
-            ));
-          }
+              if (state is GoalsEmpty || state is GoalsInitial) {
+                return _buildEmptyState(context);
+              }
 
-          return const SizedBox.shrink();
-        },
+              if (state is GoalsLoaded) {
+                return _buildContent(context, state);
+              }
+              
+              if (state is GoalCompleted) {
+                return _buildContent(context, GoalsLoaded(
+                  budgets: const [],
+                  savingsGoals: state.goals,
+                ));
+              }
+
+              return const SizedBox.shrink();
+            },
+          ),
+          bottomNavigationBar: const AppBottomNavBar(currentIndex: 2),
+        ),
       ),
-      bottomNavigationBar: const AppBottomNavBar(currentIndex: 2),
     );
   }
 
@@ -104,30 +99,37 @@ class _GoalsScreenContent extends StatelessWidget {
   }
 
   Widget _buildContent(BuildContext context, GoalsLoaded state) {
+    final brightness = Theme.of(context).brightness;
+    final secondary = brightness == Brightness.dark ? AppColorsDark.secondary : AppColors.secondary;
+    final secondaryLight = brightness == Brightness.dark ? AppColorsDark.secondaryLight : AppColors.secondaryLight;
+    final onSecondary = brightness == Brightness.dark ? AppColorsDark.onSecondary : AppColors.onSecondary;
+    final tertiary = brightness == Brightness.dark ? AppColorsDark.tertiary : AppColors.tertiary;
+    final textSecondary = brightness == Brightness.dark ? AppColorsDark.textSecondary : AppColors.textSecondary;
+
     return SingleChildScrollView(
       padding: EdgeInsets.all(20.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildTotalSavings(state.totalSaved),
+          _buildTotalSavings(state.totalSaved, secondary, secondaryLight, onSecondary),
           if (state.streak != null) ...[
             SizedBox(height: 24.h),
-            _buildStreakCard(state.streak!.currentStreak),
+            _buildStreakCard(state.streak!.currentStreak, tertiary, textSecondary),
           ],
           SizedBox(height: 24.h),
-          _buildGoalsSection(context, state),
+          _buildGoalsSection(context, state, textSecondary),
         ],
       ),
     );
   }
 
-  Widget _buildTotalSavings(double totalSaved) {
+  Widget _buildTotalSavings(double totalSaved, Color secondary, Color secondaryLight, Color onSecondary) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(24.w),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [AppColors.secondary, AppColors.secondaryLight],
+          colors: [secondary, secondaryLight],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -140,14 +142,14 @@ class _GoalsScreenContent extends StatelessWidget {
             children: [
               Icon(
                 Icons.savings_rounded,
-                color: AppColors.onSecondary,
+                color: onSecondary,
                 size: 24.w,
               ),
               SizedBox(width: 8.w),
               AppText(
                 text: 'Total Savings',
                 variant: AppTextVariant.label,
-                color: AppColors.onSecondary.withValues(alpha: 0.7),
+                color: onSecondary.withValues(alpha: 0.7),
               ),
             ],
           ),
@@ -155,7 +157,7 @@ class _GoalsScreenContent extends StatelessWidget {
           AppText(
             text: '\$${totalSaved.toStringAsFixed(2)}',
             variant: AppTextVariant.headline,
-            color: AppColors.onSecondary,
+            color: onSecondary,
             fontSize: 32.sp,
           ),
         ],
@@ -163,7 +165,7 @@ class _GoalsScreenContent extends StatelessWidget {
     );
   }
 
-  Widget _buildStreakCard(int streak) {
+  Widget _buildStreakCard(int streak, Color tertiary, Color textSecondary) {
     return AppCard(
       padding: EdgeInsets.all(16.w),
       child: Row(
@@ -171,12 +173,12 @@ class _GoalsScreenContent extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(12.w),
             decoration: BoxDecoration(
-              color: AppColors.tertiary.withValues(alpha: 0.1),
+              color: tertiary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: Icon(
               Icons.local_fire_department_rounded,
-              color: AppColors.tertiary,
+              color: tertiary,
               size: 24.w,
             ),
           ),
@@ -193,7 +195,7 @@ class _GoalsScreenContent extends StatelessWidget {
                 AppText(
                   text: '$streak day${streak != 1 ? 's' : ''} in a row!',
                   variant: AppTextVariant.caption,
-                  color: AppColors.textSecondary,
+                  color: textSecondary,
                 ),
               ],
             ),
@@ -203,7 +205,7 @@ class _GoalsScreenContent extends StatelessWidget {
     );
   }
 
-  Widget _buildGoalsSection(BuildContext context, GoalsLoaded state) {
+  Widget _buildGoalsSection(BuildContext context, GoalsLoaded state, Color textSecondary) {
     if (state.savingsGoals.isEmpty) {
       return Center(
         child: Padding(
@@ -213,13 +215,13 @@ class _GoalsScreenContent extends StatelessWidget {
               Icon(
                 Icons.savings_outlined,
                 size: 48.w,
-                color: AppColors.textSecondary,
+                color: textSecondary,
               ),
               SizedBox(height: 16.h),
               AppText(
                 text: 'No savings goals yet',
                 variant: AppTextVariant.body,
-                color: AppColors.textSecondary,
+                color: textSecondary,
               ),
             ],
           ),

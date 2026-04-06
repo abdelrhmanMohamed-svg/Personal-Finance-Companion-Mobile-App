@@ -16,6 +16,14 @@ class IncomeExpenseRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
+    final surfaceContainerLowest = brightness == Brightness.dark ? AppColorsDark.surfaceContainerLowest : AppColors.surfaceContainerLowest;
+    final onSurface = brightness == Brightness.dark ? AppColorsDark.onSurface : AppColors.onSurface;
+    final onSurfaceVariant = brightness == Brightness.dark ? AppColorsDark.onSurfaceVariant : AppColors.onSurfaceVariant;
+    final income = brightness == Brightness.dark ? AppColorsDark.income : AppColors.income;
+    final incomeBg = brightness == Brightness.dark ? AppColorsDark.incomeBg : AppColors.incomeBg;
+    final expense = brightness == Brightness.dark ? AppColorsDark.expense : AppColors.expense;
+
     final currencyFormatter = NumberFormat.currency(
       symbol: '\$',
       decimalDigits: 0,
@@ -29,9 +37,12 @@ class IncomeExpenseRow extends StatelessWidget {
             'Income',
             totalIncome,
             currencyFormatter,
-            AppColors.income,
-            AppColors.incomeBg,
+            income,
+            incomeBg,
             Icons.arrow_downward,
+            surfaceContainerLowest,
+            onSurface,
+            onSurfaceVariant,
           ),
         ),
         SizedBox(width: 12.w),
@@ -41,9 +52,12 @@ class IncomeExpenseRow extends StatelessWidget {
             'Expenses',
             totalExpenses,
             currencyFormatter,
-            AppColors.tertiaryLight,
-            AppColors.expenseIcon,
+            expense,
+            expense,
             Icons.arrow_upward,
+            surfaceContainerLowest,
+            onSurface,
+            onSurfaceVariant,
           ),
         ),
       ],
@@ -58,11 +72,14 @@ class IncomeExpenseRow extends StatelessWidget {
     Color iconColor,
     Color bgColor,
     IconData icon,
+    Color surfaceContainerLowest,
+    Color onSurface,
+    Color onSurfaceVariant,
   ) {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest,
+        color: surfaceContainerLowest,
         borderRadius: BorderRadius.circular(24.r),
       ),
       child: Column(
@@ -84,7 +101,7 @@ class IncomeExpenseRow extends StatelessWidget {
           Text(
             formatter.format(amount),
             style: TextStyle(
-              color: AppColors.onSurface,
+              color: onSurface,
               fontSize: 24.sp,
               fontWeight: FontWeight.bold,
             ),
@@ -93,7 +110,7 @@ class IncomeExpenseRow extends StatelessWidget {
           Text(
             title,
             style: TextStyle(
-              color: AppColors.onSurfaceVariant,
+              color: onSurfaceVariant,
               fontSize: 14.sp,
             ),
           ),

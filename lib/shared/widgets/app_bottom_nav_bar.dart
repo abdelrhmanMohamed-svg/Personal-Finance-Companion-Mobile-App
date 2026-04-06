@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/routes/route_constants.dart';
-import '../../core/theme/app_colors.dart';
 
 class AppBottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -15,9 +14,12 @@ class AppBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest.withValues(alpha: 0.85),
+        color: colorScheme.surface.withValues(alpha: 0.85),
         borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
       ),
       child: ClipRRect(
@@ -26,8 +28,8 @@ class AppBottomNavBar extends StatelessWidget {
           currentIndex: currentIndex,
           type: BottomNavigationBarType.fixed,
           backgroundColor: Colors.transparent,
-          selectedItemColor: AppColors.primary,
-          unselectedItemColor: AppColors.textSecondary,
+          selectedItemColor: colorScheme.primary,
+          unselectedItemColor: colorScheme.onSurface.withValues(alpha: 0.6),
           selectedFontSize: 12.sp,
           unselectedFontSize: 12.sp,
           elevation: 0,

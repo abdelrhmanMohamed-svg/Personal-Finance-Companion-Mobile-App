@@ -9,4 +9,5 @@ class AppRoutes {
   static const String transactionAdd = '/transactions/add';
   static const String goals = '/goals';
   static const String insights = '/insights';
+  static const String settings = '/settings';
 }

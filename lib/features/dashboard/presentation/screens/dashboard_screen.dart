@@ -52,8 +52,14 @@ class _DashboardScreenState extends State<DashboardScreen>
     }
   }
 
+  Color _getColor(Brightness brightness, Color lightColor, Color darkColor) {
+    return brightness == Brightness.dark ? darkColor : lightColor;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return BlocProvider(
       create: (_) => GetIt.I<GoalsCubit>()..loadGoals(),
       child: Builder(
@@ -63,7 +69,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             context.read<GoalsCubit>().refreshGoals();
           },
           child: Scaffold(
-            backgroundColor: AppColors.background,
+            backgroundColor: colorScheme.surface,
             body: SafeArea(
               child: BlocBuilder<DashboardCubit, DashboardState>(
                 buildWhen: (previous, current) {
@@ -84,9 +90,11 @@ class _DashboardScreenState extends State<DashboardScreen>
                           EmptyStateWidget(
                             icon: Icons.account_balance_wallet_outlined,
                             title: 'Welcome to Your Finance Companion',
-                            message: 'Start by adding your first transaction to track your finances.',
+                            message:
+                                'Start by adding your first transaction to track your finances.',
                             actionLabel: 'Add Transaction',
-                            onAction: () => context.push(AppRoutes.transactionAdd),
+                            onAction: () =>
+                                context.push(AppRoutes.transactionAdd),
                           ),
                           SizedBox(height: 24.h),
                           _buildQuickActions(context),
@@ -117,7 +125,11 @@ class _DashboardScreenState extends State<DashboardScreen>
                   }
 
                   if (state is DashboardLoaded) {
-                    return _buildLoadedContent(context, state.dashboard, state.recentTransactions);
+                    return _buildLoadedContent(
+                      context,
+                      state.dashboard,
+                      state.recentTransactions,
+                    );
                   }
 
                   return const Center(child: CircularProgressIndicator());
@@ -131,7 +143,11 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-  Widget _buildLoadedContent(BuildContext context, DashboardEntity dashboard, List<Transaction> recentTransactions) {
+  Widget _buildLoadedContent(
+    BuildContext context,
+    DashboardEntity dashboard,
+    List<Transaction> recentTransactions,
+  ) {
     return SingleChildScrollView(
       padding: EdgeInsets.all(20.w),
       child: Column(
@@ -195,14 +211,18 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-
   Widget _buildViewInsights(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
     return GestureDetector(
       onTap: () => context.push(AppRoutes.insights),
       child: Container(
         padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
-          color: AppColors.primary.withValues(alpha: 0.1),
+          color: _getColor(
+            brightness,
+            AppColors.primary,
+            AppColorsDark.primary,
+          ).withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12.r),
         ),
         child: Row(
@@ -210,16 +230,35 @@ class _DashboardScreenState extends State<DashboardScreen>
           children: [
             Row(
               children: [
-                Icon(Icons.insights, color: AppColors.primary, size: 24.w),
+                Icon(
+                  Icons.insights,
+                  color: _getColor(
+                    brightness,
+                    AppColors.primary,
+                    AppColorsDark.primary,
+                  ),
+                  size: 24.w,
+                ),
                 SizedBox(width: 12.w),
                 AppText(
                   text: 'View Detailed Insights',
                   variant: AppTextVariant.body,
-                  color: AppColors.primary,
+                  color: _getColor(
+                    brightness,
+                    AppColors.primary,
+                    AppColorsDark.primary,
+                  ),
                 ),
               ],
             ),
-            Icon(Icons.chevron_right, color: AppColors.primary),
+            Icon(
+              Icons.chevron_right,
+              color: _getColor(
+                brightness,
+                AppColors.primary,
+                AppColorsDark.primary,
+              ),
+            ),
           ],
         ),
       ),
@@ -227,6 +266,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   Widget _buildStreakCard(int streak) {
+    final brightness = Theme.of(context).brightness;
     return AppCard(
       padding: EdgeInsets.all(16.w),
       child: Row(
@@ -234,12 +274,20 @@ class _DashboardScreenState extends State<DashboardScreen>
           Container(
             padding: EdgeInsets.all(12.w),
             decoration: BoxDecoration(
-              color: AppColors.tertiary.withValues(alpha: 0.1),
+              color: _getColor(
+                brightness,
+                AppColors.tertiary,
+                AppColorsDark.tertiary,
+              ).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: Icon(
               Icons.local_fire_department_rounded,
-              color: AppColors.tertiary,
+              color: _getColor(
+                brightness,
+                AppColors.tertiary,
+                AppColorsDark.tertiary,
+              ),
               size: 24.w,
             ),
           ),
@@ -256,7 +304,11 @@ class _DashboardScreenState extends State<DashboardScreen>
                 AppText(
                   text: '$streak day${streak != 1 ? 's' : ''} in a row!',
                   variant: AppTextVariant.caption,
-                  color: AppColors.textSecondary,
+                  color: _getColor(
+                    brightness,
+                    AppColors.textSecondary,
+                    AppColorsDark.textSecondary,
+                  ),
                 ),
               ],
             ),
@@ -267,6 +319,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   Widget _buildHeader(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
     final hour = DateTime.now().hour;
     String greeting;
     if (hour < 12) {
@@ -286,52 +339,99 @@ class _DashboardScreenState extends State<DashboardScreen>
             AppText(
               text: greeting,
               variant: AppTextVariant.label,
-              color: AppColors.textSecondary,
+              color: _getColor(
+                brightness,
+                AppColors.textSecondary,
+                AppColorsDark.textSecondary,
+              ),
             ),
             SizedBox(height: 4.h),
             AppText(text: 'Your Finances', variant: AppTextVariant.headline),
           ],
         ),
         IconButton(
-          icon: Icon(Icons.logout, color: AppColors.textSecondary),
-          onPressed: () => _showLogoutDialog(context),
+          icon: Icon(
+            Icons.settings,
+            color: _getColor(
+              brightness,
+              AppColors.textSecondary,
+              AppColorsDark.textSecondary,
+            ),
+          ),
+          onPressed: () => _showDrawer(context),
         ),
       ],
     );
   }
 
-  void _showLogoutDialog(BuildContext context) {
-    showDialog(
+  void _showDrawer(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
+    showModalBottomSheet(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Logout'),
-        content: const Text('Are you sure you want to logout?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              context.read<AuthCubit>().signOut();
-              context.go('/login');
-            },
-            child: const Text('Logout'),
-          ),
-        ],
+      builder: (ctx) => Container(
+        padding: EdgeInsets.all(20.w),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: Icon(
+                Icons.settings,
+                color: _getColor(
+                  brightness,
+                  AppColors.primary,
+                  AppColorsDark.primary,
+                ),
+              ),
+              title: const Text('Settings'),
+              onTap: () {
+                Navigator.pop(ctx);
+                context.push(AppRoutes.settings);
+              },
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.logout,
+                color: _getColor(
+                  brightness,
+                  AppColors.error,
+                  AppColorsDark.error,
+                ),
+              ),
+              title: Text(
+                'Logout',
+                style: TextStyle(
+                  color: _getColor(
+                    brightness,
+                    AppColors.error,
+                    AppColorsDark.error,
+                  ),
+                ),
+              ),
+              onTap: () {
+                Navigator.pop(ctx);
+                context.read<AuthCubit>().signOut();
+                context.go(AppRoutes.login);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildQuickActions(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         AppText(
           text: 'QUICK ACTIONS',
           variant: AppTextVariant.caption,
-          color: AppColors.textSecondary,
+          color: _getColor(
+            brightness,
+            AppColors.textSecondary,
+            AppColorsDark.textSecondary,
+          ),
           fontWeight: FontWeight.w600,
           letterSpacing: 1.5,
         ),
@@ -362,7 +462,11 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-  Widget _buildRecentTransactions(BuildContext context, List<Transaction> transactions) {
+  Widget _buildRecentTransactions(
+    BuildContext context,
+    List<Transaction> transactions,
+  ) {
+    final brightness = Theme.of(context).brightness;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -375,7 +479,11 @@ class _DashboardScreenState extends State<DashboardScreen>
               child: AppText(
                 text: 'See All',
                 variant: AppTextVariant.label,
-                color: AppColors.primary,
+                color: _getColor(
+                  brightness,
+                  AppColors.primary,
+                  AppColorsDark.primary,
+                ),
               ),
             ),
           ],
@@ -388,7 +496,11 @@ class _DashboardScreenState extends State<DashboardScreen>
               child: AppText(
                 text: 'No recent transactions',
                 variant: AppTextVariant.body,
-                color: AppColors.textSecondary,
+                color: _getColor(
+                  brightness,
+                  AppColors.textSecondary,
+                  AppColorsDark.textSecondary,
+                ),
               ),
             ),
           )
@@ -399,7 +511,23 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   Widget _buildTransactionItem(Transaction tx) {
+    final brightness = Theme.of(context).brightness;
     final isIncome = tx.type == TransactionType.income;
+    final incomeColor = _getColor(
+      brightness,
+      AppColors.income,
+      AppColorsDark.income,
+    );
+    final expenseColor = _getColor(
+      brightness,
+      AppColors.expense,
+      AppColorsDark.expense,
+    );
+    final textSecondaryColor = _getColor(
+      brightness,
+      AppColors.textSecondary,
+      AppColorsDark.textSecondary,
+    );
     return AppCard(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       margin: EdgeInsets.only(bottom: 8.h),
@@ -408,12 +536,16 @@ class _DashboardScreenState extends State<DashboardScreen>
           Container(
             padding: EdgeInsets.all(10.w),
             decoration: BoxDecoration(
-              color: (isIncome ? AppColors.income : AppColors.expense).withValues(alpha: 0.1),
+              color: (isIncome ? incomeColor : expenseColor).withValues(
+                alpha: 0.1,
+              ),
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: Icon(
-              isIncome ? Icons.arrow_downward_rounded : Icons.arrow_upward_rounded,
-              color: isIncome ? AppColors.income : AppColors.expense,
+              isIncome
+                  ? Icons.arrow_downward_rounded
+                  : Icons.arrow_upward_rounded,
+              color: isIncome ? incomeColor : expenseColor,
               size: 20.w,
             ),
           ),
@@ -430,7 +562,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 AppText(
                   text: '${tx.date.day}/${tx.date.month}/${tx.date.year}',
                   variant: AppTextVariant.caption,
-                  color: AppColors.textSecondary,
+                  color: textSecondaryColor,
                 ),
               ],
             ),
@@ -439,7 +571,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             text: '${isIncome ? '+' : '-'}\$${tx.amount.toStringAsFixed(2)}',
             variant: AppTextVariant.body,
             fontWeight: FontWeight.w600,
-            color: isIncome ? AppColors.income : AppColors.expense,
+            color: isIncome ? incomeColor : expenseColor,
           ),
         ],
       ),

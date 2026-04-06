@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 
 enum AppTextVariant { headline, title, body, label, caption }
@@ -30,7 +29,8 @@ class AppText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textStyle = _getTextStyle();
+    final theme = Theme.of(context);
+    final textStyle = _getTextStyle(theme);
 
     return Text(
       text,
@@ -41,7 +41,7 @@ class AppText extends StatelessWidget {
     );
   }
 
-  TextStyle _getTextStyle() {
+  TextStyle _getTextStyle(ThemeData theme) {
     TextStyle baseStyle;
 
     switch (variant) {
@@ -63,7 +63,7 @@ class AppText extends StatelessWidget {
     }
 
     return baseStyle.copyWith(
-      color: color ?? AppColors.onSurface,
+      color: color ?? theme.colorScheme.onSurface,
       fontWeight: fontWeight,
       fontSize: fontSize,
       letterSpacing: letterSpacing,

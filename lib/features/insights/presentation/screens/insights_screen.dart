@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/routes/route_constants.dart';
 import '../../../../core/services/dependency_injection.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/widgets/app_bottom_nav_bar.dart';
 import '../../../../shared/widgets/app_custom_app_bar.dart';
 import '../../../../shared/widgets/empty_state_widget.dart';
@@ -23,11 +24,17 @@ class InsightsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
+    final surface = brightness == Brightness.dark ? AppColorsDark.surface : AppColors.surface;
+    final textPrimary = brightness == Brightness.dark ? AppColorsDark.textPrimary : AppColors.textPrimary;
+    final textSecondary = brightness == Brightness.dark ? AppColorsDark.textSecondary : AppColors.textSecondary;
+
     return BlocProvider(
       create: (_) => getIt<InsightsCubit>()..loadInsights(),
       child: Builder(
         builder: (ctx) {
           return Scaffold(
+            backgroundColor: surface,
             appBar: AppCustomAppBar(title: 'Insights'),
             body: BlocBuilder<InsightsCubit, InsightsState>(
               buildWhen: (previous, current) {
@@ -75,7 +82,7 @@ class InsightsScreen extends StatelessWidget {
                             TopCategoryCard(topCategory: topCategory),
                             SizedBox(height: 24.h),
                           ],
-                          _buildSectionTitle('Spending by Category'),
+                          _buildSectionTitle('Spending by Category', textPrimary),
                           SizedBox(height: 16.h),
                           CategoryPieChart(
                             categories: categories,
@@ -84,14 +91,14 @@ class InsightsScreen extends StatelessWidget {
                           SizedBox(height: 16.h),
                           CategoryLegend(categories: categories),
                           SizedBox(height: 24.h),
-                          _buildSectionTitle('Weekly Comparison'),
+                          _buildSectionTitle('Weekly Comparison', textPrimary),
                           SizedBox(height: 16.h),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
                                 'This Week: \$${state.weeklyComparison.currentWeekTotal.toStringAsFixed(2)}',
-                                style: const TextStyle(fontSize: 14),
+                                style: TextStyle(fontSize: 14, color: textPrimary),
                               ),
                               TrendIndicator(
                                 comparison: state.weeklyComparison,
@@ -103,7 +110,7 @@ class InsightsScreen extends StatelessWidget {
                             'Last Week: \$${state.weeklyComparison.previousWeekTotal.toStringAsFixed(2)}',
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.grey.shade600,
+                              color: textSecondary,
                             ),
                           ),
                           SizedBox(height: 16.h),
@@ -111,12 +118,12 @@ class InsightsScreen extends StatelessWidget {
                             comparison: state.weeklyComparison,
                           ),
                           SizedBox(height: 24.h),
-                          _buildSectionTitle('Monthly Trends'),
+                          _buildSectionTitle('Monthly Trends', textPrimary),
                           SizedBox(height: 16.h),
                           if (state.monthlyTrends.length < 2)
                             Text(
                               'Add more transactions to see trends',
-                              style: TextStyle(color: Colors.grey.shade600),
+                              style: TextStyle(color: textSecondary),
                             )
                           else
                             MonthlyTrendsChart(trends: state.monthlyTrends),
@@ -137,13 +144,13 @@ class InsightsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(String title, Color textPrimary) {
     return Text(
       title,
       style: TextStyle(
         fontSize: 18.sp,
         fontWeight: FontWeight.bold,
-        color: Colors.grey.shade800,
+        color: textPrimary,
       ),
     );
   }

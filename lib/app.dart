@@ -8,6 +8,7 @@ import 'package:personal_finance_companion_mobile_app/features/auth/presentation
 import 'package:personal_finance_companion_mobile_app/features/dashboard/presentation/cubit/dashboard_cubit.dart';
 import 'package:personal_finance_companion_mobile_app/features/insights/presentation/cubit/insights_cubit.dart';
 import 'package:personal_finance_companion_mobile_app/features/transactions/presentation/cubit/transactions_cubit.dart';
+import 'package:personal_finance_companion_mobile_app/features/settings/presentation/cubit/theme_cubit.dart';
 
 import 'core/routes/app_router.dart';
 import 'core/routes/route_constants.dart';
@@ -30,6 +31,7 @@ class PersonalFinanceApp extends StatelessWidget {
         ),
         BlocProvider<DashboardCubit>(create: (_) => getIt<DashboardCubit>()),
         BlocProvider<InsightsCubit>(create: (_) => getIt<InsightsCubit>()),
+        BlocProvider<ThemeCubit>(create: (_) => ThemeCubit()),
       ],
       child: BlocListener<AuthCubit, auth.AuthState>(
         listener: (context, state) {
@@ -41,13 +43,21 @@ class PersonalFinanceApp extends StatelessWidget {
         },
         child: Builder(
           builder: (context) {
-            return MaterialApp.router(
-              debugShowCheckedModeBanner: false,
-              title: AppConstants.appName,
-              theme: AppTheme.lightTheme,
-              darkTheme: AppTheme.darkTheme,
-              themeMode: ThemeMode.light,
-              routerConfig: AppRouter.router,
+            return BlocBuilder<ThemeCubit, ThemeState>(
+              builder: (context, themeState) {
+                return AnimatedTheme(
+                  data: Theme.of(context),
+                  duration: const Duration(milliseconds: 350),
+                  child: MaterialApp.router(
+                    debugShowCheckedModeBanner: false,
+                    title: AppConstants.appName,
+                    theme: AppTheme.lightTheme,
+                    darkTheme: AppTheme.darkTheme,
+                    themeMode: themeState.themeMode,
+                    routerConfig: AppRouter.router,
+                  ),
+                );
+              },
             );
           },
         ),

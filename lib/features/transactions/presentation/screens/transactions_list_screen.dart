@@ -45,8 +45,17 @@ class _TransactionsListScreenState extends State<TransactionsListScreen>
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<TransactionsCubit>();
+    final brightness = Theme.of(context).brightness;
+    final background = brightness == Brightness.dark ? AppColorsDark.background : AppColors.background;
+    final primary = brightness == Brightness.dark ? AppColorsDark.primary : AppColors.primary;
+    final textSecondary = brightness == Brightness.dark ? AppColorsDark.textSecondary : AppColors.textSecondary;
+    final surfaceContainer = brightness == Brightness.dark ? AppColorsDark.surfaceContainer : AppColors.surfaceContainer;
+    final onPrimary = brightness == Brightness.dark ? AppColorsDark.onPrimary : AppColors.onPrimary;
+    final income = brightness == Brightness.dark ? AppColorsDark.income : AppColors.income;
+    final expense = brightness == Brightness.dark ? AppColorsDark.expense : AppColors.expense;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: background,
       appBar: AppCustomAppBar(
         title: 'Transactions',
         actions: [
@@ -66,8 +75,8 @@ class _TransactionsListScreenState extends State<TransactionsListScreen>
                 icon: Icon(
                   Icons.filter_list_rounded,
                   color: hasFilter
-                      ? AppColors.primary
-                      : AppColors.textSecondary,
+                      ? primary
+                      : textSecondary,
                 ),
                 onPressed: () => _showFilterSheet(context),
               );
@@ -76,9 +85,9 @@ class _TransactionsListScreenState extends State<TransactionsListScreen>
         ],
         bottom: TabBar(
           controller: _tabController,
-          labelColor: AppColors.primary,
-          unselectedLabelColor: AppColors.textSecondary,
-          indicatorColor: AppColors.primary,
+          labelColor: primary,
+          unselectedLabelColor: textSecondary,
+          indicatorColor: primary,
           tabs: [
             Tab(text: 'All'),
             Tab(text: 'Income'),
@@ -96,7 +105,7 @@ class _TransactionsListScreenState extends State<TransactionsListScreen>
                 hintText: 'Search transactions...',
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
-                fillColor: AppColors.surfaceContainer,
+                fillColor: surfaceContainer,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12.r),
                   borderSide: BorderSide.none,
@@ -179,11 +188,14 @@ class _TransactionsListScreenState extends State<TransactionsListScreen>
                 return TabBarView(
                   controller: _tabController,
                   children: [
-                    _buildTransactionList(transactions),
+                    _buildTransactionList(transactions, income, expense, textSecondary),
                     _buildTransactionList(
                       transactions
                           .where((t) => t.type == TransactionType.income)
                           .toList(),
+                      income,
+                      expense,
+                      textSecondary,
                     ),
                   ],
                 );
@@ -199,8 +211,8 @@ class _TransactionsListScreenState extends State<TransactionsListScreen>
             (value) => cubit.loadTransactions(),
           );
         },
-        backgroundColor: AppColors.primary,
-        child: Icon(Icons.add_rounded, color: AppColors.onPrimary),
+        backgroundColor: primary,
+        child: Icon(Icons.add_rounded, color: onPrimary),
       ),
       bottomNavigationBar: const AppBottomNavBar(currentIndex: 1),
     );
@@ -267,7 +279,7 @@ class _TransactionsListScreenState extends State<TransactionsListScreen>
     );
   }
 
-  Widget _buildTransactionList(List<Transaction> transactions) {
+  Widget _buildTransactionList(List<Transaction> transactions, Color income, Color expense, Color textSecondary) {
     if (transactions.isEmpty) {
       return Center(
         child: Text(
@@ -283,7 +295,7 @@ class _TransactionsListScreenState extends State<TransactionsListScreen>
       itemBuilder: (context, index) {
         final transaction = transactions[index];
         final isExpense = transaction.type == TransactionType.expense;
-        final amountColor = isExpense ? AppColors.expense : AppColors.income;
+        final amountColor = isExpense ? expense : income;
         final amountPrefix = isExpense ? '-' : '+';
 
         return Padding(
@@ -320,7 +332,7 @@ class _TransactionsListScreenState extends State<TransactionsListScreen>
                       AppText(
                         text: _formatDate(transaction.date),
                         variant: AppTextVariant.caption,
-                        color: AppColors.textSecondary,
+                        color: textSecondary,
                       ),
                     ],
                   ),
@@ -329,7 +341,7 @@ class _TransactionsListScreenState extends State<TransactionsListScreen>
                   onTap: () => _showDeleteConfirmation(context, transaction),
                   child: Icon(
                     Icons.delete_outline_rounded,
-                    color: AppColors.textSecondary,
+                    color: textSecondary,
                     size: 20.w,
                   ),
                 ),

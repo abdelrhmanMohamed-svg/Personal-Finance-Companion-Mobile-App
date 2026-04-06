@@ -89,6 +89,29 @@ class _AddEditTransactionScreenState extends State<AddEditTransactionScreen> {
   @override
   Widget build(BuildContext context) {
     debugPrint("build");
+    final brightness = Theme.of(context).brightness;
+    final background = brightness == Brightness.dark
+        ? AppColorsDark.background
+        : AppColors.background;
+    final surface = brightness == Brightness.dark
+        ? AppColorsDark.surface
+        : AppColors.surface;
+    final textPrimary = brightness == Brightness.dark
+        ? AppColorsDark.textPrimary
+        : AppColors.textPrimary;
+    final textSecondary = brightness == Brightness.dark
+        ? AppColorsDark.textSecondary
+        : AppColors.textSecondary;
+    final primary = brightness == Brightness.dark
+        ? AppColorsDark.primary
+        : AppColors.primary;
+    final onPrimary = brightness == Brightness.dark
+        ? AppColorsDark.onPrimary
+        : AppColors.onPrimary;
+    final surfaceContainer = brightness == Brightness.dark
+        ? AppColorsDark.surfaceContainer
+        : AppColors.surfaceContainer;
+
     return BlocConsumer<TransactionsCubit, TransactionsState>(
       listener: (context, state) {
         if (state is TransactionAdded) {
@@ -127,11 +150,11 @@ class _AddEditTransactionScreenState extends State<AddEditTransactionScreen> {
         final categories = _getCategories(formState.type);
 
         return Scaffold(
-          backgroundColor: AppColors.background,
+          backgroundColor: background,
           appBar: AppBar(
-            backgroundColor: AppColors.surface,
+            backgroundColor: surface,
             leading: IconButton(
-              icon: Icon(Icons.close_rounded, color: AppColors.textPrimary),
+              icon: Icon(Icons.close_rounded, color: textPrimary),
               onPressed: () {
                 context.read<TransactionsCubit>().resetForm();
                 context.pop();
@@ -151,16 +174,22 @@ class _AddEditTransactionScreenState extends State<AddEditTransactionScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildTransactionTypeSelector(context, formState.type),
+                  _buildTransactionTypeSelector(context, formState.type,
+                      primary, onPrimary, textSecondary, surfaceContainer),
                   SizedBox(height: 24.h),
-                  _buildAmountField(),
+                  _buildAmountField(
+                      textPrimary, textSecondary, surfaceContainer),
                   SizedBox(height: 24.h),
-                  _buildDateSelector(context, formState.date),
+                  _buildDateSelector(context, formState.date, primary,
+                      surfaceContainer, textSecondary),
                   SizedBox(height: 24.h),
                   _buildCategorySelector(
                     context,
                     formState.category,
                     categories,
+                    primary,
+                    surfaceContainer,
+                    textSecondary,
                   ),
                   SizedBox(height: 24.h),
                   _buildDescriptionField(),
@@ -178,10 +207,14 @@ class _AddEditTransactionScreenState extends State<AddEditTransactionScreen> {
   Widget _buildTransactionTypeSelector(
     BuildContext context,
     TransactionType currentType,
+    Color primary,
+    Color onPrimary,
+    Color textSecondary,
+    Color surfaceContainer,
   ) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainer,
+        color: surfaceContainer,
         borderRadius: BorderRadius.circular(12.r),
       ),
       padding: EdgeInsets.all(4.w),
@@ -193,6 +226,9 @@ class _AddEditTransactionScreenState extends State<AddEditTransactionScreen> {
               TransactionType.expense,
               'Expense',
               currentType == TransactionType.expense,
+              primary,
+              onPrimary,
+              textSecondary,
             ),
           ),
           Expanded(
@@ -201,6 +237,9 @@ class _AddEditTransactionScreenState extends State<AddEditTransactionScreen> {
               TransactionType.income,
               'Income',
               currentType == TransactionType.income,
+              primary,
+              onPrimary,
+              textSecondary,
             ),
           ),
         ],
@@ -213,40 +252,44 @@ class _AddEditTransactionScreenState extends State<AddEditTransactionScreen> {
     TransactionType type,
     String label,
     bool isSelected,
+    Color primary,
+    Color onPrimary,
+    Color textSecondary,
   ) {
     return GestureDetector(
       onTap: () => context.read<TransactionsCubit>().setTransactionType(type),
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 12.h),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : Colors.transparent,
+          color: isSelected ? primary : Colors.transparent,
           borderRadius: BorderRadius.circular(8.r),
         ),
         child: Center(
           child: AppText(
             text: label,
             variant: AppTextVariant.label,
-            color: isSelected ? AppColors.onPrimary : AppColors.textSecondary,
+            color: isSelected ? onPrimary : textSecondary,
           ),
         ),
       ),
     );
   }
 
-  Widget _buildAmountField() {
+  Widget _buildAmountField(
+      Color textPrimary, Color textSecondary, Color surfaceContainer) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         AppText(
           text: 'Transaction Amount',
           variant: AppTextVariant.label,
-          color: AppColors.textSecondary,
+          color: textSecondary,
         ),
         SizedBox(height: 8.h),
         Container(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
           decoration: BoxDecoration(
-            color: AppColors.surfaceContainer,
+            color: surfaceContainer,
             borderRadius: BorderRadius.circular(12.r),
           ),
           child: Row(
@@ -254,7 +297,7 @@ class _AddEditTransactionScreenState extends State<AddEditTransactionScreen> {
               AppText(
                 text: '\$',
                 variant: AppTextVariant.headline,
-                color: AppColors.textPrimary,
+                color: textPrimary,
               ),
               SizedBox(width: 8.w),
               Expanded(
@@ -295,14 +338,15 @@ class _AddEditTransactionScreenState extends State<AddEditTransactionScreen> {
     );
   }
 
-  Widget _buildDateSelector(BuildContext context, DateTime currentDate) {
+  Widget _buildDateSelector(BuildContext context, DateTime currentDate,
+      Color primary, Color surfaceContainer, Color textSecondary) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         AppText(
           text: 'Date',
           variant: AppTextVariant.label,
-          color: AppColors.textSecondary,
+          color: textSecondary,
         ),
         SizedBox(height: 8.h),
         GestureDetector(
@@ -321,14 +365,14 @@ class _AddEditTransactionScreenState extends State<AddEditTransactionScreen> {
           child: Container(
             padding: EdgeInsets.all(16.w),
             decoration: BoxDecoration(
-              color: AppColors.surfaceContainer,
+              color: surfaceContainer,
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: Row(
               children: [
                 Icon(
                   Icons.calendar_today_rounded,
-                  color: AppColors.primary,
+                  color: primary,
                   size: 20.w,
                 ),
                 SizedBox(width: 12.w),
@@ -349,6 +393,9 @@ class _AddEditTransactionScreenState extends State<AddEditTransactionScreen> {
     BuildContext context,
     String currentCategory,
     List<String> categories,
+    Color primary,
+    Color surfaceContainer,
+    Color textSecondary,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -356,7 +403,7 @@ class _AddEditTransactionScreenState extends State<AddEditTransactionScreen> {
         AppText(
           text: 'Category',
           variant: AppTextVariant.label,
-          color: AppColors.textSecondary,
+          color: textSecondary,
         ),
         SizedBox(height: 8.h),
         Wrap(
@@ -371,18 +418,16 @@ class _AddEditTransactionScreenState extends State<AddEditTransactionScreen> {
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? AppColors.primary.withValues(alpha: 0.1)
-                      : AppColors.surfaceContainer,
+                      ? primary.withValues(alpha: 0.1)
+                      : surfaceContainer,
                   borderRadius: BorderRadius.circular(12.r),
-                  border: isSelected
-                      ? Border.all(color: AppColors.primary, width: 2)
-                      : null,
+                  border:
+                      isSelected ? Border.all(color: primary, width: 2) : null,
                 ),
                 child: AppText(
                   text: category,
                   variant: AppTextVariant.caption,
-                  color:
-                      isSelected ? AppColors.primary : AppColors.textSecondary,
+                  color: isSelected ? primary : textSecondary,
                 ),
               ),
             );

@@ -263,13 +263,25 @@ Improve the overall mobile experience.
 
 #### Spec Content
 - UX rules
-- Interaction behavior
+- Interaction behavior  
 - State handling patterns
 - Accessibility considerations
 
 ---
+### Phase 9: Theme Management (Light & Dark Mode)
 
-### Phase 9: Code Review & Optimization (Per Feature)
+### Objective
+Implement light and dark themes and allow users to switch between them dynamically.
+
+Deliverables
+
+Light theme configuration
+Dark theme configuration
+Theme switch (toggle)
+Persisted theme preference (local storage)
+Smooth theme switching across the app
+
+### Phase 10: Code Review & Optimization (Per Feature)
 
 Objective
 Review and improve code quality feature by feature, ensuring best practices, reusability, and high performance.

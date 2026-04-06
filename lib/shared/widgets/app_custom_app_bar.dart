@@ -20,17 +20,21 @@ class AppCustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
+    final surface = brightness == Brightness.dark ? AppColorsDark.surface : AppColors.surface;
+    final textPrimary = brightness == Brightness.dark ? AppColorsDark.textPrimary : AppColors.textPrimary;
+
     return AppBar(
       leading: leading ?? const SizedBox.shrink(),
-      backgroundColor: AppColors.surface,
+      backgroundColor: surface,
       elevation: 0,
       centerTitle: centerTitle,
       title: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.w600,
-          color: AppColors.textPrimary,
+          color: textPrimary,
         ),
       ),
       actions: actions,
