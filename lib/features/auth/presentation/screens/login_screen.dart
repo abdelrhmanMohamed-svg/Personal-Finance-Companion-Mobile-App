@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/constants/app_assets.dart';
 import '../../../../core/routes/route_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/validators.dart';
@@ -37,12 +38,11 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: AppColors.surface,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(24.w),
+          padding: EdgeInsets.symmetric(horizontal: 24.w),
           child: Form(
             key: _formKey,
             child: Column(
               children: [
-                SizedBox(height: 40.h),
                 _buildHeader(),
                 SizedBox(height: 32.h),
                 _buildFormCard(),
@@ -59,16 +59,13 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildHeader() {
     return Column(
       children: [
-        Container(
-          width: 64.w,
-          height: 64.h,
-          decoration: BoxDecoration(
-            color: AppColors.primaryContainer,
-            borderRadius: BorderRadius.circular(16.r),
-          ),
-          child: Icon(Icons.eco_rounded, color: AppColors.primary, size: 32.w),
+        Image.asset(
+          AppAssets.logo,
+          width: 200.w,
+          height: 180.h,
+          fit: BoxFit.contain,
         ),
-        SizedBox(height: 24.h),
+        SizedBox(height: 5.h),
         AppText(
           text: 'Welcome Back',
           variant: AppTextVariant.headline,
@@ -107,10 +104,6 @@ class _LoginScreenState extends State<LoginScreen> {
           _buildForgotPassword(),
           SizedBox(height: 24.h),
           _buildLoginButton(),
-          SizedBox(height: 24.h),
-          _buildDivider(),
-          SizedBox(height: 15.h),
-          _buildSocialLogin(),
         ],
       ),
     );
@@ -237,7 +230,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state is AuthAuthenticated) {
-          context.go('/dashboard');
+          context.go(AppRoutes.dashboard);
         } else if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -257,41 +250,13 @@ class _LoginScreenState extends State<LoginScreen> {
           onPressed: () {
             if (_formKey.currentState!.validate()) {
               context.read<AuthCubit>().signIn(
-                    _emailController.text.trim(),
-                    _passwordController.text,
-                  );
+                _emailController.text.trim(),
+                _passwordController.text,
+              );
             }
           },
         );
       },
-    );
-  }
-
-  Widget _buildDivider() {
-    return Row(
-      children: [
-        Expanded(child: Divider(color: AppColors.surfaceContainer)),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
-          child: AppText(
-            text: 'or',
-            variant: AppTextVariant.label,
-            fontWeight: FontWeight.w700,
-            color: AppColors.outline,
-          ),
-        ),
-        Expanded(child: Divider(color: AppColors.surfaceContainer)),
-      ],
-    );
-  }
-
-  Widget _buildSocialLogin() {
-    return AppButton(
-      text: 'Google',
-      icon: Icons.g_mobiledata_rounded,
-      variant: AppButtonVariant.outlined,
-      isFullWidth: true,
-      onPressed: () {},
     );
   }
 

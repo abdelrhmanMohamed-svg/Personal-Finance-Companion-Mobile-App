@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/constants/app_assets.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../shared/widgets/app_button.dart';
@@ -39,12 +40,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       backgroundColor: AppColors.surface,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(24.w),
+          padding: EdgeInsets.symmetric(horizontal: 24.w),
           child: Form(
             key: _formKey,
             child: Column(
               children: [
-                SizedBox(height: 24.h),
                 _buildHeader(),
                 SizedBox(height: 32.h),
                 _buildFormCard(),
@@ -61,24 +61,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget _buildHeader() {
     return Column(
       children: [
-        Container(
-          width: 80.w,
-          height: 80.h,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [AppColors.primary, AppColors.primaryDark],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(24.r),
-          ),
-          child: Icon(
-            Icons.nature_rounded,
-            color: AppColors.onPrimary,
-            size: 40.w,
-          ),
+        Image.asset(
+          AppAssets.logo,
+          width: 200.w,
+          height: 180.h,
+          fit: BoxFit.contain,
         ),
-        SizedBox(height: 24.h),
         AppText(
           text: 'Begin Your',
           variant: AppTextVariant.headline,
@@ -327,9 +315,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ? () {
                   if (_formKey.currentState!.validate()) {
                     context.read<AuthCubit>().signUp(
-                          _emailController.text.trim(),
-                          _passwordController.text,
-                        );
+                      _emailController.text.trim(),
+                      _passwordController.text,
+                    );
                   }
                 }
               : null,
