@@ -47,6 +47,7 @@ dev_dependencies:
   # Dev dependencies
   bloc_test: ^10.0.0
   flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.14.3
   flutter_native_splash: ^2.4.2
   flutter_test:
     sdk: flutter
@@ -57,6 +58,13 @@ flutter:
 
   assets:
     - assets/Financial_logo.png
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/Financial_logo.png"
+  adaptive_icon_background: "#006a35"
+  adaptive_icon_foreground: "assets/Financial_logo.png"
 
 flutter_native_splash:
   color: "#006a35"
