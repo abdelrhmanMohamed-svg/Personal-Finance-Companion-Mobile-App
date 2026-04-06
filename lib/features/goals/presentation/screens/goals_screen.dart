@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/app_text.dart';
+import '../../../../shared/widgets/empty_state_widget.dart';
 import '../cubit/goals_cubit.dart';
 import '../cubit/goals_state.dart';
 
@@ -93,27 +94,12 @@ class _GoalsScreenContent extends StatelessWidget {
   }
 
   Widget _buildEmptyState(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.flag_rounded, size: 64.w, color: AppColors.textSecondary),
-          SizedBox(height: 16.h),
-          AppText(text: 'No goals yet', variant: AppTextVariant.title),
-          SizedBox(height: 8.h),
-          AppText(
-            text: 'Create your first savings goal!',
-            variant: AppTextVariant.body,
-            color: AppColors.textSecondary,
-          ),
-          SizedBox(height: 24.h),
-          ElevatedButton.icon(
-            onPressed: () => _showAddGoalDialog(context),
-            icon: const Icon(Icons.add),
-            label: const Text('Add Goal'),
-          ),
-        ],
-      ),
+    return EmptyStateWidget(
+      icon: Icons.flag_rounded,
+      title: 'No Goals Yet',
+      message: 'Create your first savings goal!',
+      actionLabel: 'Add Goal',
+      onAction: () => _showAddGoalDialog(context),
     );
   }
 

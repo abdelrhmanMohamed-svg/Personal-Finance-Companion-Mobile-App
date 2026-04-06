@@ -5,12 +5,12 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/services/dependency_injection.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../shared/widgets/empty_state_widget.dart';
+import '../../../../shared/widgets/error_state_widget.dart';
 import '../cubit/insights_cubit.dart';
 import '../cubit/insights_state.dart';
 import '../widgets/category_legend.dart';
 import '../widgets/category_pie_chart.dart';
-import '../widgets/insights_empty_state.dart';
-import '../widgets/insights_error_state.dart';
 import '../widgets/monthly_trends_chart.dart';
 import '../widgets/top_category_card.dart';
 import '../widgets/trend_indicator.dart';
@@ -39,13 +39,21 @@ class InsightsScreen extends StatelessWidget {
                 }
 
                 if (state is InsightsEmpty) {
-                  return const InsightsEmptyState();
+                  return EmptyStateWidget(
+                    icon: Icons.insights_outlined,
+                    title: 'No Insights Yet',
+                    message: 'Add some transactions to see your spending insights.',
+                    actionLabel: 'Add Transaction',
+                    onAction: () => context.push('/transactions/add'),
+                  );
                 }
 
                 if (state is InsightsError) {
-                  return InsightsErrorState(
+                  return ErrorStateWidget(
+                    title: 'Unable to Load Insights',
                     message: state.message,
-                    onRetry: () =>
+                    actionLabel: 'Try Again',
+                    onAction: () =>
                         context.read<InsightsCubit>().refreshInsights(),
                   );
                 }

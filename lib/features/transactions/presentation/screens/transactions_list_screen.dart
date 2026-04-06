@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/app_text.dart';
+import '../../../../shared/widgets/empty_state_widget.dart';
 import '../../domain/entities/transaction.dart';
 import '../cubits/transactions_cubit.dart';
 import '../cubits/transactions_state.dart';
@@ -246,36 +247,12 @@ class _TransactionsListScreenState extends State<TransactionsListScreen>
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.all(32.w),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.receipt_long_rounded,
-              size: 80.w,
-              color: Colors.grey[400],
-            ),
-            SizedBox(height: 16.h),
-            Text(
-              'No Transactions Yet',
-              style: TextStyle(
-                fontSize: 18.sp,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey[700],
-              ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 8.h),
-            Text(
-              'Start tracking your finances by adding your first transaction.',
-              style: TextStyle(fontSize: 14.sp, color: Colors.grey[500]),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
+    return EmptyStateWidget(
+      icon: Icons.receipt_long_rounded,
+      title: 'No Transactions Yet',
+      message: 'Start tracking your finances by adding your first transaction.',
+      actionLabel: 'Add Transaction',
+      onAction: () => context.push('/transactions/add'),
     );
   }
 

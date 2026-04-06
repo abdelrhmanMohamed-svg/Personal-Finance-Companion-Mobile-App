@@ -8,6 +8,8 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/app_text.dart';
+import '../../../../shared/widgets/empty_state_widget.dart';
+import '../../../../shared/widgets/error_state_widget.dart';
 import '../../../auth/presentation/cubits/auth_cubit.dart';
 import '../../../goals/presentation/cubit/goals_cubit.dart';
 import '../../../goals/presentation/cubit/goals_state.dart';
@@ -16,11 +18,8 @@ import '../../domain/entities/dashboard_entity.dart';
 import '../cubit/dashboard_cubit.dart';
 import '../cubit/dashboard_state.dart';
 import '../widgets/balance_card.dart';
-import '../widgets/empty_state_widget.dart';
-import '../widgets/error_state_widget.dart';
 import '../widgets/income_expense_row.dart';
 import '../widgets/savings_goals_widget.dart';
-import '../widgets/summary_card.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -77,7 +76,13 @@ class _DashboardScreenState extends State<DashboardScreen>
                         children: [
                           _buildHeader(context),
                           SizedBox(height: 24.h),
-                          const EmptyStateWidget(),
+                          EmptyStateWidget(
+                            icon: Icons.account_balance_wallet_outlined,
+                            title: 'Welcome to Your Finance Companion',
+                            message: 'Start by adding your first transaction to track your finances.',
+                            actionLabel: 'Add Transaction',
+                            onAction: () => context.push('/transactions/add'),
+                          ),
                           SizedBox(height: 24.h),
                           _buildQuickActions(context),
                         ],
@@ -93,8 +98,10 @@ class _DashboardScreenState extends State<DashboardScreen>
                           _buildHeader(context),
                           SizedBox(height: 24.h),
                           ErrorStateWidget(
+                            title: 'Something Went Wrong',
                             message: state.message,
-                            onRetry: () =>
+                            actionLabel: 'Try Again',
+                            onAction: () =>
                                 context.read<DashboardCubit>().loadDashboard(),
                           ),
                           SizedBox(height: 24.h),
@@ -180,57 +187,6 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-  Widget _buildSummaryCards(DashboardEntity dashboard) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        AppText(
-          text: 'SUMMARY',
-          variant: AppTextVariant.caption,
-          color: AppColors.textSecondary,
-          fontWeight: FontWeight.w600,
-          letterSpacing: 1.5,
-        ),
-        SizedBox(height: 12.h),
-        Row(
-          children: [
-            Expanded(
-              child: SummaryCard(
-                title: 'Balance',
-                value: dashboard.currentBalance,
-                icon: Icons.account_balance_wallet,
-                color: dashboard.currentBalance >= 0
-                    ? Colors.green
-                    : Colors.red,
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 12.h),
-        Row(
-          children: [
-            Expanded(
-              child: SummaryCard(
-                title: 'Income',
-                value: dashboard.totalIncome,
-                icon: Icons.arrow_downward,
-                color: Colors.green,
-              ),
-            ),
-            SizedBox(width: 12.w),
-            Expanded(
-              child: SummaryCard(
-                title: 'Expenses',
-                value: dashboard.totalExpenses,
-                icon: Icons.arrow_upward,
-                color: Colors.red,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
 
   Widget _buildViewInsights(BuildContext context) {
     return GestureDetector(
