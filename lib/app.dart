@@ -16,8 +16,21 @@ import 'core/services/dependency_injection.dart';
 import 'core/services/supabase_service.dart';
 import 'core/theme/app_theme.dart';
 
-class PersonalFinanceApp extends StatelessWidget {
+class PersonalFinanceApp extends StatefulWidget {
   const PersonalFinanceApp({super.key});
+
+  @override
+  State<PersonalFinanceApp> createState() => _PersonalFinanceAppState();
+}
+
+class _PersonalFinanceAppState extends State<PersonalFinanceApp> {
+  late final GoRouter _router;
+
+  @override
+  void initState() {
+    super.initState();
+    _router = AppRouter.router;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,28 +49,24 @@ class PersonalFinanceApp extends StatelessWidget {
       child: BlocListener<AuthCubit, auth.AuthState>(
         listener: (context, state) {
           if (state is auth.AuthAuthenticated) {
-            context.go(AppRoutes.dashboard);
+            _router.go(AppRoutes.dashboard);
           } else if (state is auth.AuthUnauthenticated) {
-            context.go(AppRoutes.login);
+            _router.go(AppRoutes.login);
           }
         },
-        child: Builder(
-          builder: (context) {
-            return BlocBuilder<ThemeCubit, ThemeState>(
-              builder: (context, themeState) {
-                return AnimatedTheme(
-                  data: Theme.of(context),
-                  duration: const Duration(milliseconds: 350),
-                  child: MaterialApp.router(
-                    debugShowCheckedModeBanner: false,
-                    title: AppConstants.appName,
-                    theme: AppTheme.lightTheme,
-                    darkTheme: AppTheme.darkTheme,
-                    themeMode: themeState.themeMode,
-                    routerConfig: AppRouter.router,
-                  ),
-                );
-              },
+        child: BlocBuilder<ThemeCubit, ThemeState>(
+          builder: (context, themeState) {
+            return AnimatedTheme(
+              data: Theme.of(context),
+              duration: const Duration(milliseconds: 350),
+              child: MaterialApp.router(
+                debugShowCheckedModeBanner: false,
+                title: AppConstants.appName,
+                theme: AppTheme.lightTheme,
+                darkTheme: AppTheme.darkTheme,
+                themeMode: themeState.themeMode,
+                routerConfig: _router,
+              ),
             );
           },
         ),
