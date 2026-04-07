@@ -16,6 +16,66 @@ This approach enabled efficient development with clear documentation, structured
 
 ---
 
+## Screenshots
+
+### Authentication
+| | |
+|---|---|
+| ![Splash](assets/screenshots/splash_screen.png) | ![Login](assets/screenshots/login_screen.png) |
+| Splash Screen | Login Screen |
+| ![Register 1](assets/screenshots/register_screen_1.png) | ![Register 2](assets/screenshots/register_screen_2.png) |
+| Register Step 1 | Register Step 2 |
+| ![Forgot Password](assets/screenshots/forget_password_screen.png) | |
+| Forgot Password | |
+
+### Dashboard
+| | |
+|---|---|
+| ![Dashboard Light 1](assets/screenshots/dashboard_screen_1.png) | ![Dashboard Light 2](assets/screenshots/dashboard_screen_2.png) |
+| Dashboard (Light) | Dashboard Overview (Light) |
+| ![Dashboard Dark 1](assets/screenshots/dark_dashboard_screen_1.png) | ![Dashboard Dark 2](assets/screenshots/dark_dashboard_screen_2.png) |
+| Dashboard (Dark) | Dashboard Overview (Dark) |
+
+### Transactions
+| | |
+|---|---|
+| ![Transactions](assets/screenshots/transactions_screen.png) | ![Transactions Empty](assets/screenshots/transactions_epmty_state.png) |
+| Transactions List | Transactions Empty State |
+| ![Add Transaction](assets/screenshots/add_transaction_screen.png) | ![Transaction Filter](assets/screenshots/transaction_filter.png) |
+| Add Transaction | Transaction Filter |
+| ![Edit Transaction 1](assets/screenshots/edit_transaction_screen_1.png) | ![Edit Transaction 2](assets/screenshots/edit_transaction_screen_2.png) |
+| Edit Transaction | Edit Transaction Details |
+| ![Date Picker](assets/screenshots/date_picker.png) | |
+| Date Picker | |
+
+### Savings Goals
+| | |
+|---|---|
+| ![Goals](assets/screenshots/saving_goals_screen.png) | ![Goals Empty](assets/screenshots/saving_goals_empty_state.png) |
+| Savings Goals | Savings Goals Empty State |
+| ![Dark Goals](assets/screenshots/dark_saving_goals.png) | ![Dark Goals Empty](assets/screenshots/dark_saving_goals_empty_state.png) |
+| Savings Goals (Dark) | Savings Goals Empty (Dark) |
+| ![Goal Options](assets/screenshots/saving_goal_options.png) | ![Create Goal](assets/screenshots/create_saving_goal_dialog.png) |
+| Goal Options | Create Goal Dialog |
+
+### Insights
+| | |
+|---|---|
+| ![Insights Light 1](assets/screenshots/insights_screen_1.png) | ![Insights Light 2](assets/screenshots/insights_screen_2.png) |
+| Insights (Light) | Insights Charts (Light) |
+| ![Insights Dark 1](assets/screenshots/dark_insights_screen_1.png) | ![Insights Dark 2](assets/screenshots/dark_insights_screen_2.png) |
+| Insights (Dark) | Insights Charts (Dark) |
+
+### Settings
+| | |
+|---|---|
+| ![Settings Light](assets/screenshots/settings_screen.png) | ![Settings Sheet](assets/screenshots/settings_sheet.png) |
+| Settings (Light) | Settings Bottom Sheet |
+| ![Settings Dark](assets/screenshots/dark_settings_screen.png) | |
+| Settings (Dark) | |
+
+---
+
 ## Project Structure
 
 This project follows a **Feature-based + Clean Architecture** pattern.
